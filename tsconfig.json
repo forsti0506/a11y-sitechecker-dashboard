@@ -17,7 +17,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "a11y-sitechecker-dashboard": [
+        "dist/a11y-sitechecker-dashboard"
+      ],
+      "a11y-sitechecker-dashboard/*": [
+        "dist/a11y-sitechecker-dashboard/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
