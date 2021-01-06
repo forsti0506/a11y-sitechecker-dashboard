@@ -7,6 +7,7 @@
     "build": "ng build",
     "build:prod": "ng build --prod",
     "test": "ng test",
+    "test:prod": "ng test --watch=false --browsers=ChromeHeadlessCustom",
     "lint": "eslint",
     "e2e": "ng e2e",
     "commit": "git-cz",
@@ -109,14 +110,9 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+      "pre-commit": "npm run lint",
+      "commit-msg": "commitlint --edit"
     }
-  },
-  "lint-staged": {
-    "**/*.{js,ts,tsx}": [
-      "eslint --cache --fix"
-    ]
   },
   "commitlint": {
     "extends": [
