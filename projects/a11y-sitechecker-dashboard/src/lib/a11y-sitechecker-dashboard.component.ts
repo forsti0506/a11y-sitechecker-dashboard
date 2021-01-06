@@ -1,19 +1,21 @@
+/* eslint-disable prettier/prettier */
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'lib-a11y-sitechecker-dashboard',
-  template: `
-    <p>
-      a11y-sitechecker-dashboard works!
-    </p>
-  `,
+  selector: 'sitechecker-sitechecker-dashboard',
+  template: `<p>a11y-sitechecker-dashboard works!</p>
+`,
   styles: []
 })
 export class A11ySitecheckerDashboardComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+    //test
+  }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    console.log('test');
+    //test
   }
 
 }

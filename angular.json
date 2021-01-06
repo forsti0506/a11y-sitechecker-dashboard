@@ -7,13 +7,18 @@
       "projectType": "library",
       "root": "projects/a11y-sitechecker-dashboard",
       "sourceRoot": "projects/a11y-sitechecker-dashboard/src",
-      "prefix": "lib",
+      "prefix": "adashboard",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
             "tsConfig": "projects/a11y-sitechecker-dashboard/tsconfig.lib.json",
             "project": "projects/a11y-sitechecker-dashboard/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/a11y-sitechecker-dashboard/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -25,14 +30,12 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "projects/a11y-sitechecker-dashboard/tsconfig.lib.json",
-              "projects/a11y-sitechecker-dashboard/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "eslintConfig": ".eslintrc.json",
+            "lintFilePatterns": [
+              "projects/**/*.ts",
+              "projects/**/*.html"
             ]
           }
         }
