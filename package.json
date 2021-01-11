@@ -4,9 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod && tsc --project tsconfig.bin.json && copyfiles -u 2 -V dist/a11y-sitechecker-dashboard-bin/bin/* dist/a11y-sitechecker-dashboard",
-    "build:1": "tsc --project tsconfig.bin.json",
-    "build:prod": "ng build --prod && tsc",
+    "build": "ng build && tsc --project tsconfig.bin.json && copyfiles -u 2 -V dist/a11y-sitechecker-dashboard-bin/bin/* dist/a11y-sitechecker-dashboard",
+    "build:prod": "ng build --prod && tsc --project tsconfig.bin.json && copyfiles -u 2 -V dist/a11y-sitechecker-dashboard-bin/bin/* dist/a11y-sitechecker-dashboard",
     "test": "ng test",
     "test:prod": "ng test --watch=false --browsers=ChromeHeadlessCustom",
     "lint": "eslint",

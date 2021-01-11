@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FullCheckerSingleResult } from '../../../../../../a11y-full-checker/dist/lib/models/a11y-sitechecker-result';
+import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 
 @Component({
     selector: 'app-single-result',
