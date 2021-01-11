@@ -1,3 +1,16 @@
+# [1.1.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.0.0...v1.1.0) (2021-01-11)
+
+
+### Bug Fixes
+
+* path for import ([95c2f08](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/95c2f0830c4963af7bf8dc6b8d1261984b99fc5e))
+* tests ([f9e3867](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/f9e38677ba3538d0a12ddf022f00769ef25ab5ab))
+
+
+### Features
+
+* libs for starting point ([039150d](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/039150dc35f401549f803c77eddae0bbd753d55e))
+
 # 1.0.0 (2021-01-06)
 
 
