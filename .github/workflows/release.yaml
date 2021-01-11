@@ -40,7 +40,7 @@ jobs:
         run: |
           git config --local user.email "martin@forsti.eu"
           git config --local user.name "Martin Forstner"
-          mv -v /a11y-sitechecker-dashboard/package.json ../projects/a11y-sitechecker-dashboard/
+          mv -v package.json .../projects/a11y-sitechecker-dashboard/
           git commit -am "Move package.json from dist after release [skip ci]"
       - name: Push changes
         if: github.ref == 'refs/heads/main'
