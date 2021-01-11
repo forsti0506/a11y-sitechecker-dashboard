@@ -7,7 +7,7 @@
       "projectType": "library",
       "root": "projects/a11y-sitechecker-dashboard",
       "sourceRoot": "projects/a11y-sitechecker-dashboard/src",
-      "prefix": "adashboard",
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",

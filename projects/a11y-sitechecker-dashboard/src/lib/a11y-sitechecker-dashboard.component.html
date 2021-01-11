@@ -1,0 +1,42 @@
+<nav mat-tab-nav-bar class="m-5">
+  <a mat-tab-link *ngFor="let result of results"
+     (click)="(activeLink = result.url) && updateChart(activeLink)"
+     [active]="activeLink == result.url"> {{result.url}} </a>
+</nav>
+    <mat-card class="m-5">
+      <mat-card-content>
+        <div [chart]="chart"></div>
+          <mat-tab-group class="m-5" *ngIf="loaded">
+            <mat-tab label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}" *ngFor="let urlResult of sortResultByDate(results)">
+              <div class="m-2" *ngIf="urlResult.analyzedUrls?.length > 0">Analyzed URLS:
+                <button (click)="urlResult['open'] = !urlResult['open']" class="btn btn-xs btn-link link">Show Urls ({{urlResult.analyzedUrls?.length}})</button>
+                <div *ngIf="urlResult['open']"> <p *ngFor="let url of urlResult.analyzedUrls"><a  href="{{url}}">{{url}}</a></p></div>
+              </div>
+              <div class="m-2">TestEngine: {{urlResult.testEngine}}
+              </div>
+              <div class="m-2">
+                <mat-chip-list aria-label="Fish selection" multiple>
+                  <mat-chip *ngFor="let filter of filters" [selected]="filter.selected" color="primary" (click)="selectFilter(filter)">{{filter.name}}</mat-chip>
+                </mat-chip-list>
+              </div>
+              <mat-tab-group class="m-5">
+                <mat-tab label="violations">
+                  <app-single-result [singleResult]="urlResult.violations" class="m-5"></app-single-result>
+                </mat-tab>
+                <mat-tab label="incomplete">
+                  <app-single-result [singleResult]="urlResult.incomplete"></app-single-result>
+                </mat-tab>
+                <mat-tab label="inapplicable">
+                </mat-tab>
+                <mat-tab label="passes">
+                  <app-single-result [singleResult]="urlResult.passes"></app-single-result>
+                </mat-tab>
+
+              </mat-tab-group>
+            </mat-tab></mat-tab-group>
+
+      </mat-card-content>
+      <mat-card-footer>
+        Footer
+      </mat-card-footer>
+    </mat-card>

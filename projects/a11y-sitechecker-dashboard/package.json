@@ -2,7 +2,25 @@
   "name": "a11y-sitechecker-dashboard",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^8.2.14",
-    "@angular/core": "^8.2.14"
+    "@angular/animations": "~11.0.5",
+    "@angular/cdk": "^11.0.3",
+    "@angular/common": "~11.0.5",
+    "@angular/compiler": "~11.0.5",
+    "@angular/core": "~11.0.5",
+    "@angular/forms": "~11.0.5",
+    "@angular/material": "^11.0.3",
+    "@angular/platform-browser": "~11.0.5",
+    "@angular/platform-browser-dynamic": "~11.0.5",
+    "@angular/router": "~11.0.5",
+    "a11y-sitechecker": "^1.0.31",
+    "angular-highcharts": "^11.2.1",
+    "chalk": "^4.1.0",
+    "commander": "^6.2.1",
+    "highcharts": "^8.2.2",
+    "rxjs": "~6.6.3",
+    "zone.js": "~0.11.3"
+  },
+  "bin": {
+    "a11y-sitechecker-dashboard": "./bin/a11y-sitechecker.js"
   }
 }

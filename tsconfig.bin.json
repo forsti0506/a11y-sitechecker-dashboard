@@ -2,12 +2,12 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./dist",
+    "outDir": "./dist/a11y-sitechecker-dashboard-bin/",
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "importHelpers": true,
     "target": "es2015",
@@ -19,17 +19,15 @@
       "dom"
     ],
     "paths": {
-      "a11y-sitechecker-dashboard": [
-        "dist/a11y-sitechecker-dashboard"
-      ],
-      "a11y-sitechecker-dashboard/*": [
-        "dist/a11y-sitechecker-dashboard/*"
-      ]
     },
     "resolveJsonModule": true
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
-  }
+  },
+  "include": [
+    "projects/a11y-sitechecker-dashboard/bin/a11y-sitechecker.ts"
+  ]
 }
+
