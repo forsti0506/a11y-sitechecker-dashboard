@@ -3,23 +3,23 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SingleResultComponent } from './single-result.component';
 
 describe('SingleResultComponent', () => {
-  let component: SingleResultComponent;
-  let fixture: ComponentFixture<SingleResultComponent>;
+    let component: SingleResultComponent;
+    let fixture: ComponentFixture<SingleResultComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ SingleResultComponent ]
-    })
-    .compileComponents();
-  });
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [SingleResultComponent],
+        }).compileComponents();
+    });
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(SingleResultComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(SingleResultComponent);
+        component = fixture.componentInstance;
+        component.singleResult = [];
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
