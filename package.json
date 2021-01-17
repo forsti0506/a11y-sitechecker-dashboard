@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng build --watch",
     "build": "ng build && tsc --project tsconfig.bin.json && copyfiles -u 2 -V dist/a11y-sitechecker-dashboard-bin/bin/* dist/a11y-sitechecker-dashboard",
     "build:prod": "ng build --prod && tsc --project tsconfig.bin.json && copyfiles -u 2 -V dist/a11y-sitechecker-dashboard-bin/bin/* dist/a11y-sitechecker-dashboard",
     "test": "ng test",
@@ -25,7 +25,7 @@
     "@angular/platform-browser": "~11.0.5",
     "@angular/platform-browser-dynamic": "~11.0.5",
     "@angular/router": "~11.0.5",
-    "a11y-sitechecker": "^1.1.0",
+    "a11y-sitechecker": "^1.2.0",
     "angular-highcharts": "^11.2.1",
     "chalk": "^4.1.0",
     "commander": "^6.2.1",

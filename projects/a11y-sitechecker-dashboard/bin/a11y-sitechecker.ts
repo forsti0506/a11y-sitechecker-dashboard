@@ -6,8 +6,11 @@ import * as chalk from 'chalk';
 import { Config } from 'a11y-sitechecker/lib/models/config';
 import * as fs from 'fs';
 import * as child from 'child_process';
+import { analyzeSite } from 'a11y-sitechecker';
 
 const config: Config = { json: true, resultsPath: 'results', axeConfig: {} };
+
+let analyzedUrl;
 
 // Here we're using Commander to specify the CLI options
 commander
@@ -49,17 +52,23 @@ function setupTimeResults(): void {
     if (!fs.existsSync('src/assets/results/dashboard')) {
         fs.mkdirSync('src/assets/results/dashboard');
     }
-    fs.writeFileSync('src/assets/results/dashboard/' + dateToSave + '.json', JSON.stringify(jsonRunResults, null, 4));
+    const fileToSave = 'src/assets/results/dashboard/' + dateToSave + '.json';
+    fs.writeFileSync(fileToSave, JSON.stringify(jsonRunResults, null, 4));
 
-    let filelist = '';
-    const files = fs.readdirSync('src/assets/results/dashboard/');
-    files.forEach(function (file) {
-        // Do whatever you want to do with the file
-        if (file.includes('.json')) {
-            filelist += file + ';\n';
+    fs.readFile('src/assets/results/dashboard/files.json', (err, data) => {
+        let fileObject;
+        if (err) {
+            fileObject = [{ url: analyzedUrl, files: [fileToSave] }];
+        } else {
+            fileObject = JSON.parse(data.toString());
+            if (fileObject.filter((f) => f.url.includes(analyzedUrl)).length > 0) {
+                fileObject.filter((f) => f.url.includes(analyzedUrl))[0].files.push(fileToSave);
+            } else {
+                fileObject.push({ url: analyzedUrl, file: fileToSave });
+            }
         }
+        fs.writeFileSync('src/assets/results/dashboard/files.json', JSON.stringify(fileObject, null, 4));
     });
-    fs.writeFileSync('src/assets/results/dashboard/files.txt', filelist);
 }
 
 (async (): Promise<void> => {
@@ -70,7 +79,7 @@ function setupTimeResults(): void {
         }
     }
 
-    commander.rawArgs;
+    analyzedUrl = commander.args[0];
     child
         .spawn(
             'a11y-sitechecker',

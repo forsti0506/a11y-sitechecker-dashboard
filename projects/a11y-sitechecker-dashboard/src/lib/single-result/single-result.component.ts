@@ -8,6 +8,7 @@ import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitech
 })
 export class SingleResultComponent implements OnInit {
     @Input() singleResult: FullCheckerSingleResult[];
+    @Input() chosenFilter: string;
     constructor() {}
 
     ngOnInit(): void {}

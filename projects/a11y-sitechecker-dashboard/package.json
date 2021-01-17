@@ -12,7 +12,7 @@
     "@angular/platform-browser": "~11.0.5",
     "@angular/platform-browser-dynamic": "~11.0.5",
     "@angular/router": "~11.0.5",
-    "a11y-sitechecker": "^1.0.31",
+    "a11y-sitechecker": "^1.2.0",
     "angular-highcharts": "^11.2.1",
     "chalk": "^4.1.0",
     "commander": "^6.2.1",

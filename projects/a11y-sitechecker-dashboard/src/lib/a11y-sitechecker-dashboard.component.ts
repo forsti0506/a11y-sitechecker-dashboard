@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Chart } from 'angular-highcharts';
-import { HttpClient } from '@angular/common/http';
-import { A11ySitecheckerResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
-import { concat, Observable } from 'rxjs';
+import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { concat, Observable, zip } from 'rxjs';
+import { A11ySitecheckerDashboardService, DashboardFileList } from './a11y-sitechecker-dashboard.service';
+import { concatMap, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 
 interface DashboardResult {
     url: string;
@@ -15,16 +16,7 @@ interface DashboardResult {
     encapsulation: ViewEncapsulation.None,
 })
 export class A11ySitecheckerDashboardComponent implements OnInit {
-    filters = [
-        {
-            name: 'critical',
-            selected: false,
-        },
-        {
-            name: 'wcag2aa',
-            selected: false,
-        },
-    ];
+    analyzedSites: string[];
     chart = new Chart({
         chart: {
             type: 'line',
@@ -48,41 +40,52 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         },
     });
 
-    files: string[];
-    results: DashboardResult[] = [];
+    files: DashboardFileList[];
+    results: A11ySitecheckerResult[] = [];
     loaded = false;
     activeLink: string;
-    constructor(private httpClient: HttpClient) {
+    chosenFilter: string;
+    constructor(private sitecheckerService: A11ySitecheckerDashboardService) {
         //test
     }
 
     ngOnInit(): void {
-        this.httpClient.get('assets/results/dashboard/files.txt', { responseType: 'text' }).subscribe((data) => {
-            this.files = data.replace(/\n/g, '').split(';');
-            const subscriptions$: Observable<A11ySitecheckerResult>[] = [];
-            for (const file of this.files.filter((f) => f.length > 0)) {
-                subscriptions$.push(this.httpClient.get<A11ySitecheckerResult>('assets/results/dashboard/' + file));
-            }
-            concat(...subscriptions$).subscribe(
-                (result) => {
-                    if (this.results.filter((r) => r.url === result.url).length > 0) {
-                        this.results.filter((r) => r.url === result.url)[0].results.push(result);
-                    } else {
-                        this.results.push({ url: result.url, results: [result] });
-                    }
-                },
-                (error) => {
-                    console.log(error);
-                },
-                () => {
-                    this.activeLink = this.results[0].url;
-                    this.updateChart(this.activeLink);
-                },
-            );
+        this.sitecheckerService
+            .getWebsiteResultsNames()
+            .pipe(
+                map((files) => {
+                    this.analyzedSites = files.map((f) => f.url);
+                    this.activeLink = this.analyzedSites[0];
+                    this.files = files;
+                    return files;
+                }),
+                map((files) => {
+                    const results$: Observable<A11ySitecheckerResult>[] = [];
+                    files
+                        .filter((f) => f.url === this.activeLink)[0]
+                        .files.forEach((f) => results$.push(this.sitecheckerService.getResult(f)));
+                    return results$;
+                }),
+            )
+            .pipe(mergeMap((f) => zip(...f)))
+            .subscribe((f) => {
+                this.results = f;
+                this.updateChart();
+            });
+    }
+
+    siteChanged(): void {
+        const results$: Observable<A11ySitecheckerResult>[] = [];
+        this.files
+            .filter((f) => f.url === this.activeLink)[0]
+            .files.forEach((f) => results$.push(this.sitecheckerService.getResult(f)));
+        zip(...results$).subscribe((f) => {
+            this.results = f;
+            this.updateChart();
         });
     }
 
-    updateChart(url: string): void {
+    updateChart(): void {
         const dataViolations = [];
         const dataIncomplete = [];
         const dataInapplicable = [];
@@ -91,37 +94,29 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         this.chart.removeSeries(0);
         this.chart.removeSeries(0);
         this.chart.removeSeries(0);
-        this.results
-            .filter((r) => r.url === url)[0]
-            .results.forEach((f) => {
-                let absoluteCount = 0;
-                f.violations.every((v) => (absoluteCount += v.nodes.length));
-                dataViolations.push([absoluteCount]);
-                this.chart.ref$.subscribe((c) => {
-                    c.xAxis[0].setCategories(c.xAxis[0].categories.concat(new Date(f.timestamp).toLocaleString()));
-                });
+        this.results.forEach((f) => {
+            let absoluteCount = 0;
+            f.violations.every((v) => (absoluteCount += v.nodes.length));
+            dataViolations.push([absoluteCount]);
+            this.chart.ref$.subscribe((c) => {
+                c.xAxis[0].setCategories(c.xAxis[0].categories.concat(new Date(f.timestamp).toLocaleString()));
             });
-        this.results
-            .filter((r) => r.url === url)[0]
-            .results.forEach((f) => {
-                let absoluteCount = 0;
-                f.incomplete.every((v) => (absoluteCount += v.nodes.length));
-                dataIncomplete.push([absoluteCount]);
-            });
-        this.results
-            .filter((r) => r.url === url)[0]
-            .results.forEach((f) => {
-                let absoluteCount = 0;
-                f.inapplicable.every((v) => (absoluteCount += v.nodes.length));
-                dataInapplicable.push([absoluteCount]);
-            });
-        this.results
-            .filter((r) => r.url === url)[0]
-            .results.forEach((f) => {
-                let absoluteCount = 0;
-                f.passes.every((v) => (absoluteCount += v.nodes.length));
-                dataPasses.push([absoluteCount]);
-            });
+        });
+        this.results.forEach((f) => {
+            let absoluteCount = 0;
+            f.incomplete.every((v) => (absoluteCount += v.nodes.length));
+            dataIncomplete.push([absoluteCount]);
+        });
+        this.results.forEach((f) => {
+            let absoluteCount = 0;
+            f.inapplicable.every((v) => (absoluteCount += v.nodes.length));
+            dataInapplicable.push([absoluteCount]);
+        });
+        this.results.forEach((f) => {
+            let absoluteCount = 0;
+            f.passes.every((v) => (absoluteCount += v.nodes.length));
+            dataPasses.push([absoluteCount]);
+        });
         this.chart.addSeries(
             {
                 name: 'violations',
@@ -163,6 +158,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
             true,
         );
         this.loaded = true;
+        this.loadAvailableCategories(this.results[0].violations);
     }
 
     sortResultByDate(results: DashboardResult[]): A11ySitecheckerResult[] {
@@ -173,5 +169,21 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
 
     selectFilter(filter: { name: string; selected: boolean }): void {
         filter.selected = true;
+    }
+
+    loadAvailableCategories(violations: FullCheckerSingleResult[]) {
+        const tags: { name: string; selected: boolean }[] = [];
+        for (const v of violations) {
+            for (const t of v.tags) {
+                if (tags.every((tag) => tag.name !== t)) {
+                    tags.push({ name: t, selected: true });
+                }
+            }
+        }
+        // this.test.next(tags);
+    }
+
+    applyFilter(url: string): void {
+        this.chosenFilter = url;
     }
 }

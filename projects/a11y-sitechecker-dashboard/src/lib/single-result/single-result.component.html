@@ -1,26 +1,92 @@
 <mat-expansion-panel *ngFor="let violation of sortByImpact(singleResult)" class="m-2">
   <mat-expansion-panel-header>
     <mat-panel-title>
-      <mat-icon style="color: red" *ngIf="violation.impact === 'critical'" class="mr-3">error_outline</mat-icon>
-      <mat-icon style="color: orange" *ngIf="violation.impact === 'serious'" class="mr-3">error_outline</mat-icon>
-      <mat-icon style="color: yellow" *ngIf="violation.impact === 'moderate'" class="mr-3">error_outline</mat-icon>
-      <mat-icon style="color: blue" *ngIf="violation.impact === 'minor'" class="mr-3">error_outline</mat-icon>
-      <mat-icon style="color: green" *ngIf="violation.impact === null" class="mr-3">check_circle_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'critical'" class="mr-3" style="color: red">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'serious'" class="mr-3" style="color: orange">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'moderate'" class="mr-3" style="color: yellow">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'minor'" class="mr-3" style="color: blue">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === null" class="mr-3" style="color: green">check_circle_outline</mat-icon>
       {{violation.id}}
-      <span class="ml-1" matBadge="{{violation.nodes.length}}" matBadgeOverlap="false" matBadgeColor="warn"></span>
+      <span class="ml-1" matBadge="{{(violation.nodes | urlfilter: chosenFilter).length}}" matBadgeColor="warn" matBadgeOverlap="false"></span>
     </mat-panel-title>
     <mat-panel-description>
-      <span *ngFor="let tag of violation.tags"><i>{{tag}}</i>&nbsp;&nbsp;&nbsp;</span>
+      <span *ngFor="let tag of violation.tags"><mat-chip>{{tag}}</mat-chip></span>
     </mat-panel-description>
   </mat-expansion-panel-header>
-  <p>{{violation.help}}<a href="{{violation.helpUrl}}" aria-label="Get Help" target="_blank"><mat-icon>help</mat-icon></a></p>
-  <div *ngFor="let node of violation.nodes">
-    <div class="m-1">CSS-Selectors: <code *ngIf="node.targetResult.target.length === 1">{{node.targetResult.target}}</code>
-    <span *ngIf="node.targetResult.target.length > 1">
+  <p>{{violation.help}}<a aria-label="Get Help for this issue" href="{{violation.helpUrl}}" target="_blank">
+    <mat-icon>help</mat-icon>
+  </a></p>
+  <mat-card *ngFor="let node of violation.nodes | urlfilter: chosenFilter" class="m-2">
+    <mat-card-content>
+    <div class="m-1">CSS-Selectors: <code
+      *ngIf="node.targetResult.target.length === 1">{{node.targetResult.target}}</code>
+      <span *ngIf="node.targetResult.target.length > 1">
                         <code *ngFor="let target of node.targetResult.target" class="mr-3">{{target}}</code>
     </span></div>
     <div class="m-1">HTML: <code>{{node.html}}</code></div>
-    <button (click)="node.targetResult['open'] = !node.targetResult['open']" class="btn btn-xs btn-link link">Show Urls ({{node.targetResult.urls.length}})</button>
-    <div *ngIf="node.targetResult['open']"> <p *ngFor="let url of node.targetResult.urls"><a  href="{{url}}">{{url}}</a></p></div>
-  </div>
+    <button (click)="node.targetResult['open'] = !node.targetResult['open']" mat-stroked-button class="mr-1">Show Urls
+      ({{node.targetResult.urls.length}})
+    </button>
+    <button (click)="node['openAdvices'] = !node['openAdvices']" mat-stroked-button>Show Advices for Fixes
+    </button>
+    <mat-card *ngIf="node['openAdvices']" class="m-3">
+      <mat-card-content>
+        <h2 *ngIf="node.any?.length > 0">Fix 1 of the following: </h2>
+        <ul>
+          <li *ngFor="let a of node.any" class="ml-3">
+            {{a.message}}
+            <div *ngIf="a.relatedNodes.length > 0" class="m-1">Related Nodes:
+              <div *ngFor="let target of a.relatedNodes">
+                <div class="m-1">CSS-Selectors: <code
+                  *ngIf="node.targetResult.target.length === 1">{{node.targetResult.target}}</code>
+                  <span *ngIf="node.targetResult.target.length > 1">
+                        <code *ngFor="let target of node.targetResult.target" class="mr-3">{{target}}</code>
+    </span></div>
+                <div class="m-1">HTML: <code>{{target.html}}</code></div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <h2 *ngIf="node.all?.length > 0">Fix the following: </h2>
+        <ul>
+          <li *ngFor="let a of node.all" class="ml-3">{{a.message}}
+            <div *ngIf="a.relatedNodes.length > 0" class="m-1">Related Nodes:
+              <div *ngFor="let target of a.relatedNodes">
+                <div class="m-1">CSS-Selectors: <code
+                  *ngIf="node.targetResult.target.length === 1">{{node.targetResult.target}}</code>
+                  <span *ngIf="node.targetResult.target.length > 1">
+                        <code *ngFor="let target of node.targetResult.target" class="mr-3">{{target}}</code>
+    </span></div>
+                <div class="m-1">HTML: <code>{{target.html}}</code></div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <h2 *ngIf="node.none?.length > 0">Fix the following: </h2>
+        <ul>
+          <li *ngFor="let a of node.none" class="ml-3">{{a.message}}
+            <div *ngIf="a.relatedNodes.length > 0" class="m-1">Related Nodes:
+              <div *ngFor="let target of a.relatedNodes">
+                <div class="m-1">CSS-Selectors: <code
+                  *ngIf="node.targetResult.target.length === 1">{{node.targetResult.target}}</code>
+                  <span *ngIf="node.targetResult.target.length > 1">
+                        <code *ngFor="let target of node.targetResult.target" class="mr-3">{{target}}</code>
+    </span></div>
+                <div class="m-1">HTML: <code>{{target.html}}</code></div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="node.targetResult['open']">
+      <mat-card-content>
+        <mat-list role="list">
+          <mat-list-item role="listitem" *ngFor="let url of node.targetResult.urls"><mat-icon class="mr-2">link</mat-icon><a href="{{url}}">{{url}}</a></mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+    </mat-card-content>
+  </mat-card>
 </mat-expansion-panel>

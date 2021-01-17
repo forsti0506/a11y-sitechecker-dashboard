@@ -12,9 +12,11 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatBadgeModule } from '@angular/material/badge';
 import { SingleResultComponent } from './single-result/single-result.component';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatListModule } from '@angular/material/list';
+import { UrlFilterPipe } from './urlFilter.pipe';
 
 @NgModule({
-    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent],
+    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, UrlFilterPipe],
     imports: [
         MatCardModule,
         MatIconModule,
@@ -27,6 +29,7 @@ import { MatChipsModule } from '@angular/material/chips';
         MatExpansionModule,
         MatBadgeModule,
         MatChipsModule,
+        MatListModule,
     ],
     exports: [A11ySitecheckerDashboardComponent],
 })
