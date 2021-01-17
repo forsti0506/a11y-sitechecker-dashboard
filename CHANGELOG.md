@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.1.1...v1.1.2) (2021-01-11)
+
+
+### Bug Fixes
+
+* move file ([13a38d4](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/13a38d4b26992b7f08f0b05aac4f07bffa915347))
+
 ## [1.1.1](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.1.0...v1.1.1) (2021-01-11)
 
 

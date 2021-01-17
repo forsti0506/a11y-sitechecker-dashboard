@@ -1,6 +1,6 @@
 {
   "name": "a11y-sitechecker-dashboard",
-  "version": "0.0.1",
+  "version": "1.1.2",
   "peerDependencies": {
     "@angular/animations": "~11.0.5",
     "@angular/cdk": "^11.0.3",
@@ -22,5 +22,16 @@
   },
   "bin": {
     "a11y-sitechecker-dashboard": "./bin/a11y-sitechecker.js"
+  },
+  "main": "bundles/a11y-sitechecker-dashboard.umd.js",
+  "module": "fesm2015/a11y-sitechecker-dashboard.js",
+  "es2015": "fesm2015/a11y-sitechecker-dashboard.js",
+  "esm2015": "esm2015/a11y-sitechecker-dashboard.js",
+  "fesm2015": "fesm2015/a11y-sitechecker-dashboard.js",
+  "typings": "a11y-sitechecker-dashboard.d.ts",
+  "metadata": "a11y-sitechecker-dashboard.metadata.json",
+  "sideEffects": false,
+  "dependencies": {
+    "tslib": "^2.0.0"
   }
 }
