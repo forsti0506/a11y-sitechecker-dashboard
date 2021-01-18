@@ -1,13 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
-import { UrlFilterPipe } from './urlFilter.pipe';
 
 @Pipe({
     name: 'sortByImpact',
     pure: true,
 })
 export class SortByImpactPipe implements PipeTransform {
-    constructor(private urlfilter: UrlFilterPipe) {}
     transform(violations: FullCheckerSingleResult[], filter: string): FullCheckerSingleResult[] {
         let returnValue: FullCheckerSingleResult[] = deepCopy(violations);
         returnValue.sort((a, b) => {

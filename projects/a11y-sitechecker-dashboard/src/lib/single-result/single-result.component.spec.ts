@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SingleResultComponent } from './single-result.component';
+import { SortByImpactPipe } from '../sortByImpact.pipe';
 
 describe('SingleResultComponent', () => {
     let component: SingleResultComponent;
@@ -8,7 +9,8 @@ describe('SingleResultComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [SingleResultComponent],
+            declarations: [SingleResultComponent, SortByImpactPipe],
+            providers: [SortByImpactPipe],
         }).compileComponents();
     });
 
