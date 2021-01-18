@@ -14,9 +14,10 @@ import { SingleResultComponent } from './single-result/single-result.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatListModule } from '@angular/material/list';
 import { UrlFilterPipe } from './urlFilter.pipe';
+import { SortByImpactPipe } from './sortByImpact.pipe';
 
 @NgModule({
-    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, UrlFilterPipe],
+    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, UrlFilterPipe, SortByImpactPipe],
     imports: [
         MatCardModule,
         MatIconModule,
@@ -31,6 +32,7 @@ import { UrlFilterPipe } from './urlFilter.pipe';
         MatChipsModule,
         MatListModule,
     ],
+    providers: [UrlFilterPipe],
     exports: [A11ySitecheckerDashboardComponent],
 })
 export class A11ySitecheckerDashboardModule {}

@@ -1,4 +1,4 @@
-<mat-expansion-panel *ngFor="let violation of sortByImpact(singleResult)" class="m-2">
+<mat-expansion-panel *ngFor="let violation of singleResult | sortByImpact: chosenFilter" class="m-2">
   <mat-expansion-panel-header>
     <mat-panel-title>
       <mat-icon *ngIf="violation.impact === 'critical'" class="mr-3" style="color: red">error_outline</mat-icon>
@@ -7,7 +7,7 @@
       <mat-icon *ngIf="violation.impact === 'minor'" class="mr-3" style="color: blue">error_outline</mat-icon>
       <mat-icon *ngIf="violation.impact === null" class="mr-3" style="color: green">check_circle_outline</mat-icon>
       {{violation.id}}
-      <span class="ml-1" matBadge="{{(violation.nodes | urlfilter: chosenFilter).length}}" matBadgeColor="warn" matBadgeOverlap="false"></span>
+      <span class="ml-1" matBadge="{{violation.nodes.length}}" matBadgeColor="warn" matBadgeOverlap="false"></span>
     </mat-panel-title>
     <mat-panel-description>
       <span *ngFor="let tag of violation.tags"><mat-chip>{{tag}}</mat-chip></span>
@@ -16,7 +16,7 @@
   <p>{{violation.help}}<a aria-label="Get Help for this issue" href="{{violation.helpUrl}}" target="_blank">
     <mat-icon>help</mat-icon>
   </a></p>
-  <mat-card *ngFor="let node of violation.nodes | urlfilter: chosenFilter" class="m-2">
+  <mat-card *ngFor="let node of violation.nodes" class="m-2">
     <mat-card-content>
     <div class="m-1">CSS-Selectors: <code
       *ngIf="node.targetResult.target.length === 1">{{node.targetResult.target}}</code>

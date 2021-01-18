@@ -1,46 +1,64 @@
-<nav mat-tab-nav-bar class="m-5" >
-  <a mat-tab-link *ngFor="let site of analyzedSites"   (click)="(activeLink = site) && siteChanged()"
-     [active]="activeLink == site"> {{site}} </a>
+<nav class="m-5" mat-tab-nav-bar>
+  <a (click)="(activeLink = site) && siteChanged()" *ngFor="let site of analyzedSites" [active]="activeLink == site"
+     mat-tab-link> {{site}} </a>
 
 </nav>
-    <mat-card class="m-5">
-      <mat-card-content>
-        <div [chart]="chart"></div>
-          <mat-tab-group class="m-5" *ngIf="loaded">
-            <mat-tab label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}" *ngFor="let urlResult of results.reverse()">
-              <div class="m-2" *ngIf="urlResult.analyzedUrls?.length > 0">Analyzed URLS:
-                <button (click)="urlResult['open'] = !urlResult['open']" class="btn btn-xs btn-link link">Show Urls ({{urlResult.analyzedUrls?.length}})</button>
-                <div *ngIf="urlResult['open']"> <p *ngFor="let url of urlResult.analyzedUrls"><a  href="{{url}}" target="_blank">{{url}}</a>
-                  <button mat-stroked-button (click)="applyFilter(url)">Filter to this url</button></p></div>
+<mat-card class="m-5">
+  <mat-card-content>
+    <div [chart]="chart"></div>
+    <mat-tab-group *ngIf="loaded" class="m-5">
+      <mat-tab *ngFor="let urlResult of results.reverse()" label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}">
+        <mat-card class="m-3">
+          <mat-card-content>
+            <div *ngIf="urlResult.analyzedUrls?.length > 0" class="m-2">Analyzed URLS:
+              <button (click)="urlResult['open'] = !urlResult['open']" mat-stroked-button class="ml-2">Show Urls
+                ({{urlResult.analyzedUrls?.length}})
+              </button>
+              <div *ngIf="urlResult['open']">
+                <mat-chip *ngFor="let url of urlResult.analyzedUrls" class="m-1" (click)="applyFilter(url)" [selected]="this.chosenFilter === url">
+                  {{url}}
+                </mat-chip>
+<!--                <a href="{{url}}" target="_blank">{{url}}</a>-->
+<!--                <button (click)="applyFilter(url)" mat-stroked-button>Filter to this url</button>-->
               </div>
-              <div class="m-2">TestEngine: {{urlResult.testEngine?.name}} ({{urlResult.testEngine?.version}})
-              </div>
-              <div class="m-2" *ngIf="urlResult.testEnvironment">TestEnvironment: {{urlResult.testEnvironment?.userAgent}} (Width:
-                {{urlResult.testEnvironment?.windowHeight}}, Height: {{urlResult.testEnvironment?.windowWidth}}, orientation-Angle: {{urlResult.testEnvironment?.orientationAngle}}, orentiation-Type: {{urlResult.testEnvironment?.orientationType}}
-              </div>
-              <div class="m-2">
-                <mat-chip-list aria-label="Filter" multiple>
-<!--                  <mat-chip *ngFor="let filter of test$ | async" [selected]="filter.selected" color="primary" (click)="selectFilter(filter)">{{filter.name}}</mat-chip>-->
-                </mat-chip-list>
-              </div>
-              <mat-tab-group class="m-5">
-                <mat-tab label="violations">
-                  <app-single-result [singleResult]="urlResult.violations" class="m-5" [chosenFilter]="chosenFilter"></app-single-result>
-                </mat-tab>
-                <mat-tab label="incomplete">
-                  <app-single-result [singleResult]="urlResult.incomplete" [chosenFilter]="chosenFilter"></app-single-result>
-                </mat-tab>
-                <mat-tab label="inapplicable">
-                </mat-tab>
-                <mat-tab label="passes">
-                  <app-single-result [singleResult]="urlResult.passes" [chosenFilter]="chosenFilter"></app-single-result>
-                </mat-tab>
+            </div>
+            <div class="m-2">TestEngine: {{urlResult.testEngine?.name}} ({{urlResult.testEngine?.version}})
+            </div>
+            <div *ngIf="urlResult.testEnvironment" class="m-2">TestEnvironment: {{urlResult.testEnvironment?.userAgent}}
+              (Width:
+              {{urlResult.testEnvironment?.windowHeight}}, Height: {{urlResult.testEnvironment?.windowWidth}},
+              orientation-Angle: {{urlResult.testEnvironment?.orientationAngle}},
+              orentiation-Type: {{urlResult.testEnvironment?.orientationType}}
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <div class="m-2">
+          <mat-chip-list aria-label="Filter" multiple>
+            <!--                  <mat-chip *ngFor="let filter of test$ | async" [selected]="filter.selected" color="primary" (click)="selectFilter(filter)">{{filter.name}}</mat-chip>-->
+          </mat-chip-list>
+        </div>
+        <mat-tab-group class="m-5">
+          <mat-tab label="violations">
+            <app-single-result [chosenFilter]="chosenFilter" [singleResult]="urlResult.violations"
+                               class="m-5"></app-single-result>
+          </mat-tab>
+          <mat-tab label="incomplete">
+            <app-single-result [chosenFilter]="chosenFilter" [singleResult]="urlResult.incomplete"></app-single-result>
+          </mat-tab>
+          <mat-tab label="inapplicable">
+          </mat-tab>
+          <mat-tab label="passes">
+            <app-single-result [chosenFilter]="chosenFilter" [singleResult]="urlResult.passes"></app-single-result>
+          </mat-tab>
 
-              </mat-tab-group>
-            </mat-tab></mat-tab-group>
+        </mat-tab-group>
 
-      </mat-card-content>
-      <mat-card-footer>
-        Footer
-      </mat-card-footer>
-    </mat-card>
+
+      </mat-tab>
+    </mat-tab-group>
+
+  </mat-card-content>
+  <mat-card-footer>
+    Footer
+  </mat-card-footer>
+</mat-card>
