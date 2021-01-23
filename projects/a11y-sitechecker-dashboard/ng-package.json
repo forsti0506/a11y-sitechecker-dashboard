@@ -12,6 +12,7 @@
     "angular-highcharts",
     "chalk",
     "commander",
-    "highcharts"
+    "highcharts",
+    "mongodb"
   ]
 }
