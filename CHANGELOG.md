@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.4.0...v1.4.1) (2021-01-23)
+
+
+### Bug Fixes
+
+* mongodb dependency added to lib ([1911807](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/19118073018ed50996dd3a6cc73728d9b1ccd66f))
+
 # [1.4.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.3.0...v1.4.0) (2021-01-23)
 
 
