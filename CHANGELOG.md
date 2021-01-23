@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.2.0...v1.3.0) (2021-01-18)
+
+
+### Bug Fixes
+
+* fix tests ([decf5eb](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/decf5eb74757d757f7550e29c53e7f589aa6e8ab))
+
+
+### Features
+
+* some refactoring + pipes ([d508215](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/d508215db2075afd106f21d0b747f5e4f1a71f34))
+
 # [1.2.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.1.2...v1.2.0) (2021-01-17)
 
 
