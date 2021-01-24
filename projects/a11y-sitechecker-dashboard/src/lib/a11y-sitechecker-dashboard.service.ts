@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { HttpClient } from '@angular/common/http';
 import { SiteResult } from './models/site-result';
-import { publishReplay, refCount, shareReplay } from 'rxjs/operators';
+import { publishReplay, refCount } from 'rxjs/operators';
 
 export interface DashboardFileList {
     url: string;
@@ -23,6 +23,7 @@ export class A11ySitecheckerDashboardService {
     incompletes = new Map<string, Observable<FullCheckerSingleResult[]>>();
     inapplicables = new Map<string, Observable<FullCheckerSingleResult[]>>();
     passes = new Map<string, Observable<FullCheckerSingleResult[]>>();
+
     constructor(private httpClient: HttpClient) {}
     getWebsiteResultsNames(): Observable<AnalyzedSite[]> {
         if (this.serverMode) {

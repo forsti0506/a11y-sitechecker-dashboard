@@ -4,15 +4,17 @@ import { A11ySitecheckerDashboardService } from './a11y-sitechecker-dashboard.se
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('A11ySitecheckerDashboardService', () => {
+    let service: A11ySitecheckerDashboardService;
     beforeEach(() =>
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
-            providers: [HttpClientTestingModule],
-        }),
+            providers: [],
+        }).compileComponents(),
     );
 
-    it('should be created', () => {
-        const service: A11ySitecheckerDashboardService = TestBed.get(A11ySitecheckerDashboardService);
+    beforeEach(() => (service = TestBed.inject(A11ySitecheckerDashboardService)));
+
+    it('should be created', async () => {
         expect(service).toBeTruthy();
     });
 });

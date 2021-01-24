@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SingleResultComponent } from './single-result.component';
 import { SortByImpactPipe } from '../sortByImpact.pipe';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('SingleResultComponent', () => {
     let component: SingleResultComponent;
@@ -9,12 +10,10 @@ describe('SingleResultComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
             declarations: [SingleResultComponent, SortByImpactPipe],
             providers: [SortByImpactPipe],
         }).compileComponents();
-    });
-
-    beforeEach(() => {
         fixture = TestBed.createComponent(SingleResultComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
