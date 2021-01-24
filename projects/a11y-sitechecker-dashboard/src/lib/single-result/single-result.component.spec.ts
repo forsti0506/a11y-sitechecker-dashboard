@@ -17,7 +17,6 @@ describe('SingleResultComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(SingleResultComponent);
         component = fixture.componentInstance;
-        component.singleResult = [];
         fixture.detectChanges();
     });
 
