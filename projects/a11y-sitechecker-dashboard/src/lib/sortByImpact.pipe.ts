@@ -6,7 +6,9 @@ import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitech
     pure: true,
 })
 export class SortByImpactPipe implements PipeTransform {
-    transform(violations: FullCheckerSingleResult[], filter: string): FullCheckerSingleResult[] {
+    transform(violations: FullCheckerSingleResult[], filter: string, type: string): FullCheckerSingleResult[] {
+        if (!violations) return [];
+        if (type === 'inapplicables') return violations;
         let returnValue: FullCheckerSingleResult[] = deepCopy(violations);
         returnValue.sort((a, b) => {
             if (a.impact === b.impact) return 0;

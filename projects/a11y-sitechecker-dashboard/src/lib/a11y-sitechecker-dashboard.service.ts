@@ -1,25 +1,99 @@
 import { Injectable } from '@angular/core';
-import { concat, Observable, of } from 'rxjs';
-import { A11ySitecheckerResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { Observable } from 'rxjs';
+import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { HttpClient } from '@angular/common/http';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
-import * as url from 'url';
+import { SiteResult } from './models/site-result';
+import { publishReplay, refCount, shareReplay } from 'rxjs/operators';
 
 export interface DashboardFileList {
     url: string;
     files: string[];
 }
+export interface AnalyzedSite {
+    _id: string;
+    url: string;
+}
+
 @Injectable({
     providedIn: 'root',
 })
 export class A11ySitecheckerDashboardService {
+    serverMode = true;
+    violations = new Map<string, Observable<FullCheckerSingleResult[]>>();
+    incompletes = new Map<string, Observable<FullCheckerSingleResult[]>>();
+    inapplicables = new Map<string, Observable<FullCheckerSingleResult[]>>();
+    passes = new Map<string, Observable<FullCheckerSingleResult[]>>();
     constructor(private httpClient: HttpClient) {}
-    getWebsiteResultsNames(): Observable<DashboardFileList[]> {
-        return this.httpClient.get<DashboardFileList[]>('assets/results/dashboard/files.json');
+    getWebsiteResultsNames(): Observable<AnalyzedSite[]> {
+        if (this.serverMode) {
+            return this.httpClient.get<AnalyzedSite[]>('http://localhost:4201/sites');
+        }
+        // return this.httpClient.get<DashboardFileList[]>('assets/results/dashboard/files.json');
+    }
+
+    getSiteResults(id: string): Observable<SiteResult[]> {
+        return this.httpClient.get<SiteResult[]>('http://localhost:4201/siteResults/' + id);
+    }
+
+    getViolations(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+        if (!this.violations.get(id + timestamp)) {
+            this.violations.set(
+                id + timestamp,
+                this.httpClient
+                    .post<FullCheckerSingleResult[]>('http://localhost:4201/violations/' + id, {
+                        data: timestamp,
+                    })
+                    .pipe(publishReplay(1), refCount()),
+            );
+        }
+        return this.violations.get(id + timestamp);
+    }
+    getIncompletes(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+        if (!this.incompletes.get(id + timestamp)) {
+            this.incompletes.set(
+                id + timestamp,
+                this.httpClient
+                    .post<FullCheckerSingleResult[]>('http://localhost:4201/incompletes/' + id, {
+                        data: timestamp,
+                    })
+                    .pipe(publishReplay(1), refCount()),
+            );
+        }
+        return this.incompletes.get(id + timestamp);
+    }
+    getInapplicables(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+        if (!this.inapplicables.get(id + timestamp)) {
+            this.inapplicables.set(
+                id + timestamp,
+                this.httpClient
+                    .post<FullCheckerSingleResult[]>('http://localhost:4201/inapplicables/' + id, {
+                        data: timestamp,
+                    })
+                    .pipe(publishReplay(1), refCount()),
+            );
+        }
+        return this.inapplicables.get(id + timestamp);
+    }
+    getPasses(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+        if (!this.passes.get(id + timestamp)) {
+            this.passes.set(
+                id + timestamp,
+                this.httpClient
+                    .post<FullCheckerSingleResult[]>('http://localhost:4201/passes/' + id, {
+                        data: timestamp,
+                    })
+                    .pipe(publishReplay(1), refCount()),
+            );
+        }
+        return this.passes.get(id + timestamp);
     }
 
     getResult(activeUrl: string): Observable<A11ySitecheckerResult> {
-        return this.httpClient.get<A11ySitecheckerResult>(activeUrl.replace('src/', ''));
+        if (this.serverMode) {
+            return this.httpClient.get<A11ySitecheckerResult>('http://localhost:4201/result');
+        } else {
+            return this.httpClient.get<A11ySitecheckerResult>(activeUrl.replace('src/', ''));
+        }
     }
     //   const subscriptions$: Observable<A11ySitecheckerResult>[] = [];
     //   for (const file of this.files.filter((f) => f.length > 0)) {

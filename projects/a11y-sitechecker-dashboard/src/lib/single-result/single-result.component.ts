@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { A11ySitecheckerDashboardService } from '../a11y-sitechecker-dashboard.service';
 
 @Component({
     selector: 'app-single-result',
@@ -7,23 +8,30 @@ import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitech
     styleUrls: ['./single-result.component.css'],
 })
 export class SingleResultComponent implements OnInit {
-    @Input() singleResult: FullCheckerSingleResult[];
+    @Input() id: string;
+    @Input() timestamp: string;
     @Input() chosenFilter: string;
-    constructor() {}
+    @Input() type: string;
+    violations: FullCheckerSingleResult[];
+    constructor(private sitecheckerService: A11ySitecheckerDashboardService) {}
 
-    ngOnInit(): void {}
-
-    // sortByImpact(violations: FullCheckerSingleResult[]): FullCheckerSingleResult[] {
-    //     violations.sort((a, b) => {
-    //         if (a.impact === b.impact) return 0;
-    //         if (a.impact === 'critical') return -1;
-    //         if (b.impact === 'critical') return 1;
-    //         if (a.impact === 'serious') return -1;
-    //         if (b.impact === 'serious') return 1;
-    //         if (a.impact === 'moderate') return -1;
-    //         if (b.impact === 'moderate') return 1;
-    //         return 0;
-    //     });
-    //     return violations;
-    // }
+    ngOnInit(): void {
+        if (this.type === 'violations') {
+            this.sitecheckerService.getViolations(this.id, this.timestamp).subscribe((r) => {
+                this.violations = r;
+            });
+        } else if (this.type === 'incompletes') {
+            this.sitecheckerService.getIncompletes(this.id, this.timestamp).subscribe((r) => {
+                this.violations = r;
+            });
+        } else if (this.type === 'inapplicables') {
+            this.sitecheckerService.getInapplicables(this.id, this.timestamp).subscribe((r) => {
+                this.violations = r;
+            });
+        } else if (this.type === 'passes') {
+            this.sitecheckerService.getPasses(this.id, this.timestamp).subscribe((r) => {
+                this.violations = r;
+            });
+        }
+    }
 }

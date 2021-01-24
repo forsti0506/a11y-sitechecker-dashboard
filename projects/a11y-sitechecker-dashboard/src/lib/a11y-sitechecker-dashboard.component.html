@@ -1,37 +1,57 @@
-<nav class="m-5" mat-tab-nav-bar>
-  <a (click)="(activeLink = site) && siteChanged()" *ngFor="let site of analyzedSites" [active]="activeLink == site"
-     mat-tab-link> {{site}} </a>
+<mat-toolbar color="primary" role="banner">
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <h1>A11y-Siteckecker Dashboard</h1>
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
+    <mat-icon>favorite</mat-icon>
+  </button>
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
+    <mat-icon>share</mat-icon>
+  </button>
+</mat-toolbar>
 
+<nav class="m-5" mat-tab-nav-bar>
+  <a (click)="(activeLink = site.url) && siteChanged(site)" *ngFor="let site of analyzedSites"
+     [active]="activeLink == site.url"
+     mat-tab-link> {{site.url}} </a>
 </nav>
 <mat-card class="m-5">
   <mat-card-content>
     <div [chart]="chart"></div>
-    <mat-tab-group *ngIf="loaded" class="m-5">
+    <mat-tab-group *ngIf="loaded" class="m-5" role="main">
       <mat-tab *ngFor="let urlResult of results.reverse()" label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}">
-        <mat-card class="m-3">
-          <mat-card-content>
-            <div *ngIf="urlResult.analyzedUrls?.length > 0" class="m-2">Analyzed URLS:
-              <button (click)="urlResult['open'] = !urlResult['open']" mat-stroked-button class="ml-2">Show Urls
-                ({{urlResult.analyzedUrls?.length}})
-              </button>
-              <div *ngIf="urlResult['open']">
-                <mat-chip *ngFor="let url of urlResult.analyzedUrls" class="m-1" (click)="applyFilter(url)" [selected]="this.chosenFilter === url">
-                  {{url}}
-                </mat-chip>
-<!--                <a href="{{url}}" target="_blank">{{url}}</a>-->
-<!--                <button (click)="applyFilter(url)" mat-stroked-button>Filter to this url</button>-->
+        <ng-template matTabContent>
+          <mat-card class="m-3">
+            <mat-card-content>
+              <div *ngIf="urlResult.analyzedUrls?.length > 0" class="m-2">Analyzed URLS:
+                <button (click)="urlResult['open'] = !urlResult['open']" class="ml-2" mat-stroked-button>Show Urls
+                  ({{urlResult.analyzedUrls?.length}})
+                </button>
+                <div *ngIf="urlResult['open']">
+                  <mat-chip-list aria-label="Filter by urls!" multiple>
+                  <mat-chip (click)="applyFilter(url)" *ngFor="let url of urlResult.analyzedUrls" [selected]="this.chosenFilter === url"
+                            class="m-1">
+                    {{url}}
+                  </mat-chip></mat-chip-list>
+                  <!--                <a href="{{url}}" target="_blank">{{url}}</a>-->
+                  <!--                <button (click)="applyFilter(url)" mat-stroked-button>Filter to this url</button>-->
+                </div>
               </div>
-            </div>
-            <div class="m-2">TestEngine: {{urlResult.testEngine?.name}} ({{urlResult.testEngine?.version}})
-            </div>
-            <div *ngIf="urlResult.testEnvironment" class="m-2">TestEnvironment: {{urlResult.testEnvironment?.userAgent}}
-              (Width:
-              {{urlResult.testEnvironment?.windowHeight}}, Height: {{urlResult.testEnvironment?.windowWidth}},
-              orientation-Angle: {{urlResult.testEnvironment?.orientationAngle}},
-              orentiation-Type: {{urlResult.testEnvironment?.orientationType}}
-            </div>
-          </mat-card-content>
-        </mat-card>
+              <div class="m-2"><strong>TestEngine:</strong> {{urlResult.testEngine?.name}}
+                ({{urlResult.testEngine?.version}})
+              </div>
+              <div *ngIf="urlResult.testEnvironment" class="m-2">
+                <strong>TestEnvironment:</strong> {{urlResult.testEnvironment?.userAgent}}
+                (<strong>Width</strong>:
+                {{urlResult.testEnvironment?.windowHeight}}, <strong>Height:</strong> {{urlResult.testEnvironment?.windowWidth}},
+                <strong>orientation-Angle:</strong> {{urlResult.testEnvironment?.orientationAngle}},
+                  <strong>orentiation-Type:</strong> {{urlResult.testEnvironment?.orientationType}})
+              </div>
+            </mat-card-content>
+          </mat-card>
+
         <div class="m-2">
           <mat-chip-list aria-label="Filter" multiple>
             <!--                  <mat-chip *ngFor="let filter of test$ | async" [selected]="filter.selected" color="primary" (click)="selectFilter(filter)">{{filter.name}}</mat-chip>-->
@@ -39,26 +59,38 @@
         </div>
         <mat-tab-group class="m-5">
           <mat-tab label="violations">
-            <app-single-result [chosenFilter]="chosenFilter" [singleResult]="urlResult.violations"
-                               class="m-5"></app-single-result>
+            <ng-template matTabContent>
+            <app-single-result [chosenFilter]="chosenFilter" [id]="urlResult.id"
+                               [timestamp]="urlResult.timestamp" class="m-5" type="violations"></app-single-result>
+            </ng-template>
           </mat-tab>
           <mat-tab label="incomplete">
-            <app-single-result [chosenFilter]="chosenFilter" [singleResult]="urlResult.incomplete"></app-single-result>
+            <ng-template matTabContent>
+            <app-single-result  [chosenFilter]="chosenFilter" [id]="urlResult.id"
+                               [timestamp]="urlResult.timestamp" type="incompletes"></app-single-result>
+            </ng-template>
           </mat-tab>
           <mat-tab label="inapplicable">
+            <ng-template matTabContent>
+            <app-single-result  [chosenFilter]="chosenFilter" [id]="urlResult.id"
+                               [timestamp]="urlResult.timestamp" type="inapplicables"></app-single-result>
+            </ng-template>
           </mat-tab>
           <mat-tab label="passes">
-            <app-single-result [chosenFilter]="chosenFilter" [singleResult]="urlResult.passes"></app-single-result>
+            <ng-template matTabContent>
+            <app-single-result [chosenFilter]="chosenFilter" [id]="urlResult.id"
+                               [timestamp]="urlResult.timestamp" type="passes"></app-single-result>
+            </ng-template>
           </mat-tab>
 
         </mat-tab-group>
 
-
+        </ng-template>
       </mat-tab>
     </mat-tab-group>
 
   </mat-card-content>
-  <mat-card-footer>
+  <mat-card-footer role="contentinfo">
     Footer
   </mat-card-footer>
 </mat-card>

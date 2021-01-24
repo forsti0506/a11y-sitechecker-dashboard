@@ -27,12 +27,15 @@
   "metadata": "a11y-sitechecker-dashboard.metadata.json",
   "sideEffects": false,
   "dependencies": {
-    "tslib": "^2.0.0",
-    "a11y-sitechecker": "^1.5.1",
+    "@types/uuid": "^8.3.0",
+    "a11y-sitechecker": "^1.5.3",
+    "axe-core": "^4.1.1",
     "angular-highcharts": "^11.2.1",
     "chalk": "^4.1.0",
     "commander": "^6.2.1",
     "highcharts": "^8.2.2",
-    "mongodb": "^3.6.3"
+    "mongodb": "^3.6.3",
+    "tslib": "^2.0.0",
+    "uuid": "^8.3.2"
   }
 }

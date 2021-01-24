@@ -13,6 +13,8 @@
     "chalk",
     "commander",
     "highcharts",
-    "mongodb"
+    "mongodb",
+    "uuid",
+    "axe-core"
   ]
 }

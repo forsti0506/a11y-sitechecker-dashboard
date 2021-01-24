@@ -1,3 +1,6 @@
+.mat-tab-label-content, .mat-tab-link  {
+ color: #000000 !important;
+}
 article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block;
 }

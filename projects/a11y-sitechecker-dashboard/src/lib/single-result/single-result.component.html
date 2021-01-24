@@ -1,16 +1,16 @@
-<mat-expansion-panel *ngFor="let violation of singleResult | sortByImpact: chosenFilter" class="m-2">
+<mat-expansion-panel *ngFor="let violation of violations | sortByImpact: chosenFilter: type" class="m-2">
   <mat-expansion-panel-header>
     <mat-panel-title>
-      <mat-icon *ngIf="violation.impact === 'critical'" class="mr-3" style="color: red">error_outline</mat-icon>
-      <mat-icon *ngIf="violation.impact === 'serious'" class="mr-3" style="color: orange">error_outline</mat-icon>
-      <mat-icon *ngIf="violation.impact === 'moderate'" class="mr-3" style="color: yellow">error_outline</mat-icon>
-      <mat-icon *ngIf="violation.impact === 'minor'" class="mr-3" style="color: blue">error_outline</mat-icon>
-      <mat-icon *ngIf="violation.impact === null" class="mr-3" style="color: green">check_circle_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'critical'" class="mr-3" style="color: #981b1e">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'serious'" class="mr-3" style="color: #e31c3d">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'moderate'" class="mr-3" style="color: #4c2c92">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === 'minor'" class="mr-3" style="color: #0071bc">error_outline</mat-icon>
+      <mat-icon *ngIf="violation.impact === null" class="mr-3" style="color: #2e8540">check_circle_outline</mat-icon>
       {{violation.id}}
-      <span class="ml-1" matBadge="{{violation.nodes.length}}" matBadgeColor="warn" matBadgeOverlap="false"></span>
+      <span class="ml-1" matBadge="{{violation.nodes.length}}" matBadgeColor="warn" matBadgeOverlap="false" *ngIf="type !== 'inapplicables'" ></span>
     </mat-panel-title>
     <mat-panel-description>
-      <span *ngFor="let tag of violation.tags"><mat-chip>{{tag}}</mat-chip></span>
+      <span aria-label="Tags related to this part" *ngFor="let tag of violation.tags" role="list"><mat-chip class="mr-2" role="listitem">{{tag}}</mat-chip></span>
     </mat-panel-description>
   </mat-expansion-panel-header>
   <p>{{violation.help}}<a aria-label="Get Help for this issue" href="{{violation.helpUrl}}" target="_blank">
