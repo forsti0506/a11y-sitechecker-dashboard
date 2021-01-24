@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.4.1...v1.4.2) (2021-01-23)
+
+
+### Bug Fixes
+
+* version of sitechecker ([5ef68e3](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/5ef68e394fafd2030f8a3a6b45c0e19d4969ff6d))
+
 ## [1.4.1](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.4.0...v1.4.1) (2021-01-23)
 
 
