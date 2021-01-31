@@ -1,24 +1,53 @@
-# A11ySitecheckerDashboard
+# A11y-Sitechecker-Dashboard
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.14.
+It is splitted into 2 Parts
 
-## Code scaffolding
+## Binary Part
+The binary part is for preparing the results for the Angular-Dashboard and can easily be integrated in automatic tests (like jenkins builds). There it uses the <a href="https://www.npmjs.com/package/a11y-sitechecker">A11y-Sitechecker</a> and wraps it in a way that the results can be handled aftwarrds
+```json
+"runtest": "a11y-sitechecker-dashboard https://www.test.at --config=configorf.json -T=1000"
+```
+For the command line there can be provided the following parts:
+```properties
+--config <string>: "Provide a config.json"
+-T, --threshold <number> "permit this number of errors, warnings, or notices, otherwise fail with exit code 2"
+```
+In Common you can provide the config like <a href="https://www.npmjs.com/package/a11y-sitechecker">A11y-Sitechecker</a>. There are some additional options:
 
-Run `ng generate component component-name --project a11y-sitechecker-dashboard` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project a11y-sitechecker-dashboard`.
-> Note: Don't forget to add `--project a11y-sitechecker-dashboard` or else it will be added to the default project in your `angular.json` file. 
+It is possible to provide a mongodb for saving the results. If there is no db connection provided, it will be saved as json Files (Important: Performance is not the best).
+```json
+ "db": {
+    "type": "mongodb",
+    "url": "urlofmongodb",
+    "user": "user",
+    "password": "password"
+  }
+```
+If you like to tag your results with own Tags (for example if a team is responsible for this part), you can do it by providing for the axe-core IDs string arrays:
 
-## Build
+```json
+  "idTags": {
+    "aria-required-attr": [
+      "Team1"
+    ],
+    "meta-viewport": [
+      "Team2"
+    ]
+  }
+```
+## Angular Library
+The Library is for presenting the results in a meaningful way. The library is based on angular material. You can use it by adding this tag to an application (serverMode means that the results are fetched from Serve, if false json files are searched)
 
-Run `ng build a11y-sitechecker-dashboard` to build the project. The build artifacts will be stored in the `dist/` directory.
+```angular2html
+<sitechecker-dashboard [serverMode]="false"></sitechecker-dashboard>
+```
+###Endpoints for providing server side results
 
-## Publishing
-
-After building your library with `ng build a11y-sitechecker-dashboard`, go to the dist folder `cd dist/a11y-sitechecker-dashboard` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test a11y-sitechecker-dashboard` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```
+get /sites => AnalyzedSite[]
+get /siteResults/:id => SiteResult[]
+post /violations/:id (data: timestamp) => FullCheckerSingleResult[]
+post /incompletes/:id (data: timestamp) => FullCheckerSingleResult[]
+post /inapplicables/:id (data: timestamp) => FullCheckerSingleResult[]
+post /passes/:id (data: timestamp) => FullCheckerSingleResult[]
+```

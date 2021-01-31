@@ -10,7 +10,7 @@
       <span class="ml-1" matBadge="{{violation.nodes.length}}" matBadgeColor="warn" matBadgeOverlap="false" *ngIf="type !== 'inapplicables'" ></span>
     </mat-panel-title>
     <mat-panel-description>
-      <span aria-label="Tags related to this part" *ngFor="let tag of violation.tags" role="list"><mat-chip class="mr-2" role="listitem">{{tag}}</mat-chip></span>
+      <span aria-label="Tags related to this part" *ngFor="let tag of violation.customTags" role="list"><mat-chip class="mr-2" role="listitem">{{tag}}</mat-chip></span>
     </mat-panel-description>
   </mat-expansion-panel-header>
   <p>{{violation.help}}<a aria-label="Get Help for this issue" href="{{violation.helpUrl}}" target="_blank">
@@ -18,6 +18,8 @@
   </a></p>
   <mat-card *ngFor="let node of violation.nodes" class="m-2">
     <mat-card-content>
+      <div class="m-1">Related Tags:
+        <span aria-label="Tags related to this part" *ngFor="let tag of violation.tags" role="list"><mat-chip class="mr-2" role="listitem">{{tag}}</mat-chip></span></div>
     <div class="m-1">CSS-Selectors: <code
       *ngIf="node.targetResult.target.length === 1">{{node.targetResult.target}}</code>
       <span *ngIf="node.targetResult.target.length > 1">

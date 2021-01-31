@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Chart } from 'angular-highcharts';
 import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
-import { A11ySitecheckerDashboardService, AnalyzedSite, DashboardFileList } from './a11y-sitechecker-dashboard.service';
+import { A11ySitecheckerDashboardService, AnalyzedSite } from './a11y-sitechecker-dashboard.service';
 import { SiteResult } from './models/site-result';
 
 interface DashboardResult {
@@ -15,6 +15,9 @@ interface DashboardResult {
     encapsulation: ViewEncapsulation.None,
 })
 export class A11ySitecheckerDashboardComponent implements OnInit {
+    @Input()
+    serverMode = true;
+
     analyzedSites: AnalyzedSite[];
     chart = new Chart({
         chart: {
@@ -39,7 +42,6 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         },
     });
 
-    files: DashboardFileList[];
     results: SiteResult[] = [];
     loaded = false;
     activeLink: string;
@@ -50,6 +52,8 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.sitecheckerService.serverMode = this.serverMode;
+
         this.sitecheckerService.getWebsiteResultsNames().subscribe((sites) => {
             this.analyzedSites = sites;
             this.activeLink = sites[0].url;
@@ -79,7 +83,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
     }
 
     siteChanged(site: AnalyzedSite): void {
-        this.sitecheckerService.getSiteResults(site._id).subscribe((s) => {
+        this.sitecheckerService.getSiteResults(site).subscribe((s) => {
             this.results = s;
             this.updateChart();
         });

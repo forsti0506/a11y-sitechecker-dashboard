@@ -12,6 +12,7 @@ import { setupAxeConfig, setupConfig } from 'a11y-sitechecker/lib/utils/setup-co
 import { v4 as uuidv4 } from 'uuid';
 import { SiteResult } from '../src/lib/models/site-result';
 import { AnalyzedSite } from '../src/lib/a11y-sitechecker-dashboard.service';
+import { getEscaped } from 'a11y-sitechecker/lib/utils/helper-functions';
 
 const config: DashboardConfig = { json: true, resultsPath: 'results', axeConfig: {}, threshold: 0 };
 
@@ -21,7 +22,6 @@ let analyzedUrl;
 commander
     .version(pkg.version)
     .usage('[options] <paths>')
-    .option('-j, --json', 'Output results as JSON')
     .option('--config <string>', 'Provide a config.json')
     .option(
         '-T, --threshold <number>',
@@ -30,21 +30,83 @@ commander
     )
     .parse(process.argv);
 
+function setupSiteresult(id, sitecheckerResult: A11ySitecheckerResult): SiteResult {
+    return {
+        id: id,
+        toolOptions: sitecheckerResult.toolOptions,
+        testEngine: sitecheckerResult.testEngine,
+        testRunner: sitecheckerResult.testRunner,
+        testEnvironment: sitecheckerResult.testEnvironment,
+        timestamp: sitecheckerResult.timestamp,
+        analyzedUrls: sitecheckerResult.analyzedUrls,
+        countViolations: sitecheckerResult.violations
+            .map((v) => v.nodes.length)
+            .reduce((count, value) => count + value, 0),
+        countPasses: sitecheckerResult.passes.map((v) => v.nodes.length).reduce((count, value) => count + value, 0),
+        countIncomplete: sitecheckerResult.incomplete
+            .map((v) => v.nodes.length)
+            .reduce((count, value) => count + value, 0),
+        countInapplicable: sitecheckerResult.inapplicable.length,
+    };
+}
+
+function defineExtraTags(sitecheckerResult: A11ySitecheckerResult): void {
+    if (config.idTags) {
+        sitecheckerResult.violations.forEach((v) => {
+            if (config?.idTags[v.id]) {
+                if (v.customTags) {
+                    v.customTags.push(...config?.idTags[v.id]);
+                } else {
+                    v.customTags = config?.idTags[v.id];
+                }
+            }
+        });
+        sitecheckerResult.inapplicable.forEach((v) => {
+            if (config?.idTags[v.id]) {
+                if (v.customTags) {
+                    v.customTags.push(...config?.idTags[v.id]);
+                } else {
+                    v.customTags = config?.idTags[v.id];
+                }
+            }
+        });
+        sitecheckerResult.incomplete.forEach((v) => {
+            if (config?.idTags[v.id]) {
+                if (v.customTags) {
+                    v.customTags.push(...config?.idTags[v.id]);
+                } else {
+                    v.customTags = config?.idTags[v.id];
+                }
+            }
+        });
+        sitecheckerResult.passes.forEach((v) => {
+            if (config?.idTags[v.id]) {
+                if (v.customTags) {
+                    v.customTags.push(...config?.idTags[v.id]);
+                } else {
+                    v.customTags = config?.idTags[v.id];
+                }
+            }
+        });
+    }
+}
+
 async function setupTimeResults(): Promise<void> {
+    const sitecheckerResult: A11ySitecheckerResult = await entry(
+        setupConfig(commander),
+        setupAxeConfig(config),
+        commander.args[0],
+        true,
+    );
+
+    console.log(
+        chalk.blue('#############################################################################################'),
+    );
+    console.log(chalk.blue('Updating database with the current results)'));
+    console.log(
+        chalk.blue('#############################################################################################'),
+    );
     if (config.db && config.db.type === 'mongodb') {
-        console.log(
-            chalk.blue('#############################################################################################'),
-        );
-        console.log(chalk.blue('Updating database with the current results)'));
-        console.log(
-            chalk.blue('#############################################################################################'),
-        );
-        const sitecheckerResult: A11ySitecheckerResult = await entry(
-            setupConfig(commander),
-            setupAxeConfig(config),
-            commander.args[0],
-            true,
-        );
         const client = new MongoClient('mongodb+srv://' + config.db.url, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -65,35 +127,20 @@ async function setupTimeResults(): Promise<void> {
                 id = uuidv4();
                 await db.collection('sites').insertOne({ _id: id, url: sitecheckerResult.url });
             }
-            const siteResult: SiteResult = {
-                id: id,
-                toolOptions: sitecheckerResult.toolOptions,
-                testEngine: sitecheckerResult.testEngine,
-                testRunner: sitecheckerResult.testRunner,
-                testEnvironment: sitecheckerResult.testEnvironment,
-                timestamp: sitecheckerResult.timestamp,
-                analyzedUrls: sitecheckerResult.analyzedUrls,
-                countViolations: sitecheckerResult.violations
-                    .map((v) => v.nodes.length)
-                    .reduce((count, value) => count + value, 0),
-                countPasses: sitecheckerResult.passes
-                    .map((v) => v.nodes.length)
-                    .reduce((count, value) => count + value, 0),
-                countIncomplete: sitecheckerResult.incomplete
-                    .map((v) => v.nodes.length)
-                    .reduce((count, value) => count + value, 0),
-                countInapplicable: sitecheckerResult.inapplicable.length,
-            };
+            const siteResult = setupSiteresult(id, sitecheckerResult);
 
             await db.collection('siteResults').insertOne({ siteResult });
+            defineExtraTags(sitecheckerResult);
             await db.collection('violations').insertOne({
                 id: id,
                 timestamp: sitecheckerResult.timestamp,
                 violations: sitecheckerResult.violations,
             });
-            await db
-                .collection('passes')
-                .insertOne({ id: id, timestamp: sitecheckerResult.timestamp, violations: sitecheckerResult.passes });
+            await db.collection('passes').insertOne({
+                id: id,
+                timestamp: sitecheckerResult.timestamp,
+                violations: sitecheckerResult.passes,
+            });
             await db.collection('incompletes').insertOne({
                 id: id,
                 timestamp: sitecheckerResult.timestamp,
@@ -116,8 +163,6 @@ async function setupTimeResults(): Promise<void> {
         console.log(
             chalk.blue('#############################################################################################'),
         );
-        const runResults = fs.readFileSync(config.resultsPath + '/results.json');
-        const jsonRunResults: A11ySitecheckerResult = JSON.parse(runResults.toString());
         const currentDate = new Date();
         const dateToSave = String(
             currentDate.getDate().toLocaleString().padStart(2, '0') +
@@ -134,21 +179,44 @@ async function setupTimeResults(): Promise<void> {
             fs.mkdirSync('src/assets/results/dashboard');
         }
         const fileToSave = 'src/assets/results/dashboard/' + dateToSave + '.json';
-        fs.writeFileSync(fileToSave, JSON.stringify(jsonRunResults, null, 4));
 
-        fs.readFile('src/assets/results/dashboard/files.json', (err, data) => {
+        fs.readFile('src/assets/results/dashboard/files.json', async (err, data) => {
             let fileObject;
+            let id;
             if (err) {
-                fileObject = [{ url: analyzedUrl, files: [fileToSave] }];
+                id = uuidv4();
+                fileObject = [{ id: id, url: analyzedUrl, files: [fileToSave] }];
             } else {
                 fileObject = JSON.parse(data.toString());
                 if (fileObject.filter((f) => f.url.includes(analyzedUrl)).length > 0) {
+                    id = fileObject.filter((f) => f.url.includes(analyzedUrl))[0].id;
                     fileObject.filter((f) => f.url.includes(analyzedUrl))[0].files.push(fileToSave);
                 } else {
-                    fileObject.push({ url: analyzedUrl, file: fileToSave });
+                    id = uuidv4();
+                    fileObject.push({ id: id, url: analyzedUrl, files: [fileToSave] });
                 }
             }
+            const siteResult = setupSiteresult(id, sitecheckerResult);
+            defineExtraTags(sitecheckerResult);
+            fs.writeFileSync(fileToSave, JSON.stringify(siteResult, null, 4));
             fs.writeFileSync('src/assets/results/dashboard/files.json', JSON.stringify(fileObject, null, 4));
+
+            const violationsPath =
+                'src/assets/results/dashboard/' + getEscaped(id + sitecheckerResult.timestamp) + '_violations.json';
+            await fs.promises.writeFile(violationsPath, JSON.stringify(sitecheckerResult.violations, null, 4));
+
+            const incompletesPath =
+                'src/assets/results/dashboard/' + getEscaped(id + sitecheckerResult.timestamp) + '_incompletes.json';
+            await fs.promises.writeFile(incompletesPath, JSON.stringify(sitecheckerResult.incomplete, null, 4));
+
+            const passesPath =
+                'src/assets/results/dashboard/' + getEscaped(id + sitecheckerResult.timestamp) + '_passes.json';
+            await fs.promises.writeFile(passesPath, JSON.stringify(sitecheckerResult.passes, null, 4));
+
+            const inapplicablesPath =
+                'src/assets/results/dashboard/' + getEscaped(id + sitecheckerResult.timestamp) + '_inapplicables.json';
+
+            await fs.promises.writeFile(inapplicablesPath, JSON.stringify(sitecheckerResult.inapplicable, null, 4));
         });
     }
 }
@@ -161,6 +229,9 @@ async function setupTimeResults(): Promise<void> {
         }
         if (configFile.db) {
             config.db = configFile.db;
+        }
+        if (configFile.idTags) {
+            config.idTags = configFile.idTags;
         }
     }
 
