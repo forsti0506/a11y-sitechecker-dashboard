@@ -1,3 +1,17 @@
+# [1.5.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.4.2...v1.5.0) (2021-01-24)
+
+
+### Bug Fixes
+
+* merged master ([5fb8bcb](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/5fb8bcb6fc096768e79789ff83bc6b2b79c961ad))
+* test ([779f86b](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/779f86b0f07dfdf6703a4dc37da737d55132f442))
+* test fixes ([fd3a7ac](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/fd3a7ac88d65a6d21d5485b5462f9f4038a0a4e0))
+
+
+### Features
+
+* database support for mongodb ([b597e3b](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/b597e3b8db5565dccfe102a0303f3cf82be707f4))
+
 ## [1.4.2](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.4.1...v1.4.2) (2021-01-23)
 
 
