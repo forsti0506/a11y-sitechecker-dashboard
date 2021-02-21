@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.5.0...v1.6.0) (2021-01-31)
+
+
+### Features
+
+* JSON and MongoDBSupport, updatet readme ([7f3ffc1](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/7f3ffc139e6b9eb901f78a6a785f89cff5d7f49c))
+
 # [1.5.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.4.2...v1.5.0) (2021-01-24)
 
 
