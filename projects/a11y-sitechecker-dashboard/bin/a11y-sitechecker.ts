@@ -99,14 +99,14 @@ async function setupTimeResults(): Promise<void> {
         true,
     );
 
-    console.log(
-        chalk.blue('#############################################################################################'),
-    );
-    console.log(chalk.blue('Updating database with the current results)'));
-    console.log(
-        chalk.blue('#############################################################################################'),
-    );
     if (config.db && config.db.type === 'mongodb') {
+        console.log(
+            chalk.blue('#############################################################################################'),
+        );
+        console.log(chalk.blue('Updating database with the current results)'));
+        console.log(
+            chalk.blue('#############################################################################################'),
+        );
         const client = new MongoClient('mongodb+srv://' + config.db.url, {
             useNewUrlParser: true,
             useUnifiedTopology: true,

@@ -26,11 +26,19 @@
                         <code *ngFor="let target of node.targetResult.target" class="mr-3">{{target}}</code>
     </span></div>
     <div class="m-1">HTML: <code>{{node.html}}</code></div>
-    <button (click)="node.targetResult['open'] = !node.targetResult['open']" mat-stroked-button class="mr-1">Show Urls
+    <button (click)="(node['openImage'] = false) && (node['openAdvices'] = false) && (node.targetResult['open'] = !node.targetResult['open'])" mat-stroked-button class="mr-1">Show Urls
       ({{node.targetResult.urls.length}})
     </button>
-    <button (click)="node['openAdvices'] = !node['openAdvices']" mat-stroked-button>Show Advices for Fixes
+      <button (click)="(node['openImage'] = !node['openImage']) && (node['openAdvices'] = false) && (node.targetResult['open'] = false)" mat-stroked-button>Show related image
+      </button>
+    <button (click)="(node['openImage'] = false) && (node['openAdvices'] = !node['openAdvices']) && (node.targetResult['open'] = false)" mat-stroked-button>Show Advices for Fixes
     </button>
+      <mat-card *ngIf="node['openImage']">
+        <mat-card-content>
+          <b>The red element is the Element you are searching for. If there is no element visible with red border, it is not visible or a common element which can't be marked with a border!</b>
+          <img [src]="'assets/images/' + node.image" alt="Image for the opened node where the corresponding html tag is borderd red." >
+        </mat-card-content>
+      </mat-card>
     <mat-card *ngIf="node['openAdvices']" class="m-3">
       <mat-card-content>
         <h2 *ngIf="node.any?.length > 0">Fix 1 of the following: </h2>

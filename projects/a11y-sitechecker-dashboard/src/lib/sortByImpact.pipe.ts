@@ -6,7 +6,11 @@ import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitech
     pure: true,
 })
 export class SortByImpactPipe implements PipeTransform {
-    transform(violations: FullCheckerSingleResult[], filter: string, type: string): FullCheckerSingleResult[] {
+    transform(
+        violations: FullCheckerSingleResult[] | undefined,
+        filter: string[] | undefined,
+        type: string | undefined,
+    ): FullCheckerSingleResult[] {
         if (!violations) return [];
         if (type === 'inapplicables') return violations;
         let returnValue: FullCheckerSingleResult[] = deepCopy(violations);
@@ -20,9 +24,9 @@ export class SortByImpactPipe implements PipeTransform {
             if (b.impact === 'moderate') return 1;
             return 0;
         });
-        if (filter) {
+        if (filter && filter.length > 0) {
             for (const violation of returnValue) {
-                violation.nodes = violation.nodes.filter((i) => i.targetResult.urls.includes(filter));
+                violation.nodes = violation.nodes.filter((i) => filter.some((s) => i.targetResult.urls.includes(s)));
             }
         }
 
@@ -31,26 +35,26 @@ export class SortByImpactPipe implements PipeTransform {
     }
 }
 
-function deepCopy(obj) {
-    if (typeof obj !== 'object' || obj === null) {
-        return obj;
+export const deepCopy = <T>(target: T): T => {
+    if (target === null) {
+        return target;
     }
-
-    if (obj instanceof Date) {
-        return new Date(obj.getTime());
+    if (target instanceof Date) {
+        return new Date(target.getTime()) as any;
     }
-
-    if (obj instanceof Array) {
-        return obj.reduce((arr, item, i) => {
-            arr[i] = deepCopy(item);
-            return arr;
-        }, []);
+    if (target instanceof Array) {
+        const cp = [] as any[];
+        (target as any[]).forEach((v) => {
+            cp.push(v);
+        });
+        return cp.map((n: any) => deepCopy<any>(n)) as any;
     }
-
-    if (obj instanceof Object) {
-        return Object.keys(obj).reduce((newObj, key) => {
-            newObj[key] = deepCopy(obj[key]);
-            return newObj;
-        }, {});
+    if (typeof target === 'object' && target !== {}) {
+        const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
+        Object.keys(cp).forEach((k) => {
+            cp[k] = deepCopy<any>(cp[k]);
+        });
+        return cp as T;
     }
-}
+    return target;
+};

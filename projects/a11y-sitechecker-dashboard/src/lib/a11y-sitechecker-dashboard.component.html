@@ -31,12 +31,10 @@
                 </button>
                 <div *ngIf="urlResult['open']">
                   <mat-chip-list aria-label="Filter by urls!" multiple>
-                  <mat-chip (click)="applyFilter(url)" *ngFor="let url of urlResult.analyzedUrls" [selected]="this.chosenFilter === url"
+                  <mat-chip (click)="applyFilter(url)" *ngFor="let url of urlResult.analyzedUrls" [selected]="this.chosenFilters?.includes(url)"
                             class="m-1">
                     {{url}}
                   </mat-chip></mat-chip-list>
-                  <!--                <a href="{{url}}" target="_blank">{{url}}</a>-->
-                  <!--                <button (click)="applyFilter(url)" mat-stroked-button>Filter to this url</button>-->
                 </div>
               </div>
               <div class="m-2"><strong>TestEngine:</strong> {{urlResult.testEngine?.name}}
@@ -60,25 +58,25 @@
         <mat-tab-group class="m-5">
           <mat-tab label="violations">
             <ng-template matTabContent>
-            <app-single-result [chosenFilter]="chosenFilter" [id]="urlResult.id"
+            <app-single-result [chosenFilter]="chosenFilters" [id]="urlResult.id"
                                [timestamp]="urlResult.timestamp" class="m-5" type="violations"></app-single-result>
             </ng-template>
           </mat-tab>
           <mat-tab label="incomplete">
             <ng-template matTabContent>
-            <app-single-result  [chosenFilter]="chosenFilter" [id]="urlResult.id"
+            <app-single-result  [chosenFilter]="chosenFilters" [id]="urlResult.id"
                                [timestamp]="urlResult.timestamp" type="incompletes"></app-single-result>
             </ng-template>
           </mat-tab>
           <mat-tab label="inapplicable">
             <ng-template matTabContent>
-            <app-single-result  [chosenFilter]="chosenFilter" [id]="urlResult.id"
+            <app-single-result  [chosenFilter]="chosenFilters" [id]="urlResult.id"
                                [timestamp]="urlResult.timestamp" type="inapplicables"></app-single-result>
             </ng-template>
           </mat-tab>
           <mat-tab label="passes">
             <ng-template matTabContent>
-            <app-single-result [chosenFilter]="chosenFilter" [id]="urlResult.id"
+            <app-single-result [chosenFilter]="chosenFilters" [id]="urlResult.id"
                                [timestamp]="urlResult.timestamp" type="passes"></app-single-result>
             </ng-template>
           </mat-tab>

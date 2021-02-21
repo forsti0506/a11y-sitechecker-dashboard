@@ -3,7 +3,7 @@ import { Observable, of, zip } from 'rxjs';
 import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { HttpClient } from '@angular/common/http';
 import { SiteResult } from './models/site-result';
-import { mergeMap, publishReplay, refCount, switchMap } from 'rxjs/operators';
+import { mergeMap, publishReplay, refCount } from 'rxjs/operators';
 
 export interface AnalyzedSite {
     _id: string;
@@ -43,7 +43,11 @@ export class A11ySitecheckerDashboardService {
         }
     }
 
-    getViolations(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+    getViolations(
+        id: string | undefined,
+        timestamp: string | undefined,
+    ): Observable<FullCheckerSingleResult[]> | undefined {
+        if (!id || !timestamp) return undefined;
         if (!this.violations.get(id + timestamp)) {
             if (this.serverMode) {
                 this.violations.set(
@@ -67,7 +71,11 @@ export class A11ySitecheckerDashboardService {
         }
         return this.violations.get(id + timestamp);
     }
-    getIncompletes(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+    getIncompletes(
+        id: string | undefined,
+        timestamp: string | undefined,
+    ): Observable<FullCheckerSingleResult[]> | undefined {
+        if (!id || !timestamp) return undefined;
         if (!this.incompletes.get(id + timestamp)) {
             if (this.serverMode) {
                 this.incompletes.set(
@@ -91,7 +99,11 @@ export class A11ySitecheckerDashboardService {
         }
         return this.incompletes.get(id + timestamp);
     }
-    getInapplicables(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+    getInapplicables(
+        id: string | undefined,
+        timestamp: string | undefined,
+    ): Observable<FullCheckerSingleResult[]> | undefined {
+        if (!id || !timestamp) return undefined;
         if (!this.inapplicables.get(id + timestamp)) {
             if (this.serverMode) {
                 this.inapplicables.set(
@@ -115,7 +127,11 @@ export class A11ySitecheckerDashboardService {
         }
         return this.inapplicables.get(id + timestamp);
     }
-    getPasses(id: string, timestamp: string): Observable<FullCheckerSingleResult[]> {
+    getPasses(
+        id: string | undefined,
+        timestamp: string | undefined,
+    ): Observable<FullCheckerSingleResult[]> | undefined {
+        if (!id || !timestamp) return undefined;
         if (!this.passes.get(id + timestamp)) {
             if (this.serverMode) {
                 this.passes.set(

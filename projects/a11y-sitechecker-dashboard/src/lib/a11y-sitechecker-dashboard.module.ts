@@ -32,5 +32,6 @@ import { SortByImpactPipe } from './sortByImpact.pipe';
         MatListModule,
     ],
     exports: [A11ySitecheckerDashboardComponent],
+    providers: [SortByImpactPipe],
 })
 export class A11ySitecheckerDashboardModule {}

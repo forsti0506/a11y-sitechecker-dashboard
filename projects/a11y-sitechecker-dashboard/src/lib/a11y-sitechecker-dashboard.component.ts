@@ -3,6 +3,7 @@ import { Chart } from 'angular-highcharts';
 import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { A11ySitecheckerDashboardService, AnalyzedSite } from './a11y-sitechecker-dashboard.service';
 import { SiteResult } from './models/site-result';
+import { Observable, Subject } from 'rxjs';
 
 interface DashboardResult {
     url: string;
@@ -18,7 +19,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
     @Input()
     serverMode = true;
 
-    analyzedSites: AnalyzedSite[];
+    analyzedSites: AnalyzedSite[] | undefined;
     chart = new Chart({
         chart: {
             type: 'line',
@@ -44,8 +45,8 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
 
     results: SiteResult[] = [];
     loaded = false;
-    activeLink: string;
-    chosenFilter: string;
+    activeLink: string | undefined;
+    chosenFilters: string[] = [];
 
     constructor(private sitecheckerService: A11ySitecheckerDashboardService) {
         //test
@@ -59,27 +60,6 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
             this.activeLink = sites[0].url;
             this.siteChanged(sites[0]);
         });
-
-        // .pipe(
-        //     map((files) => {
-        //         this.analyzedSites = files.map((f) => f.url);
-        //         this.activeLink = this.analyzedSites[0];
-        //         this.files = f.f;
-        //         return files;
-        //     }),
-        //     map((files) => {
-        //         const results$: Observable<A11ySitecheckerResult>[] = [];
-        //         files
-        //             .filter((f) => f.url === this.activeLink)[0]
-        //             .files.forEach((f) => results$.push(this.sitecheckerService.getResult(f)));
-        //         return results$;
-        //     }),
-        // )
-        // .pipe(mergeMap((f) => zip(...f)))
-        // .subscribe((f) => {
-        //     this.results = f;
-        //     this.updateChart();
-        // });
     }
 
     siteChanged(site: AnalyzedSite): void {
@@ -87,39 +67,31 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
             this.results = s;
             this.updateChart();
         });
-        // const results$: Observable<A11ySitecheckerResult>[] = [];
-        // this.files
-        //     .filter((f) => f.url === this.activeLink)[0]
-        //     .files.forEach((f) => results$.push(this.sitecheckerService.getResult(f)));
-        // zip(...results$).subscribe((f) => {
-        //     this.results = f;
-        //     this.updateChart();
-        // });
     }
 
     updateChart(): void {
-        const dataViolations = [];
-        const dataIncomplete = [];
-        const dataInapplicable = [];
-        const dataPasses = [];
+        const dataViolations: number[] = [];
+        const dataIncomplete: number[] = [];
+        const dataInapplicable: number[] = [];
+        const dataPasses: number[] = [];
         this.chart.removeSeries(0);
         this.chart.removeSeries(0);
         this.chart.removeSeries(0);
         this.chart.removeSeries(0);
         this.results.forEach((f) => {
-            dataViolations.push([f.countViolations]);
+            dataViolations.push(f.countViolations);
             this.chart.ref$.subscribe((c) => {
                 c.xAxis[0].setCategories(c.xAxis[0].categories.concat(new Date(f.timestamp).toLocaleString()));
             });
         });
         this.results.forEach((f) => {
-            dataIncomplete.push([f.countIncomplete]);
+            dataIncomplete.push(f.countIncomplete);
         });
         this.results.forEach((f) => {
-            dataInapplicable.push([f.countInapplicable]);
+            dataInapplicable.push(f.countInapplicable);
         });
         this.results.forEach((f) => {
-            dataPasses.push([f.countPasses]);
+            dataPasses.push(f.countPasses);
         });
         this.chart.addSeries(
             {
@@ -147,6 +119,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
                 type: 'line',
                 data: dataInapplicable,
                 color: 'blue',
+                visible: false,
             },
             true,
             true,
@@ -157,6 +130,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
                 type: 'line',
                 data: dataPasses,
                 color: 'green',
+                visible: false,
             },
             true,
             true,
@@ -175,19 +149,19 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         filter.selected = true;
     }
 
-    loadAvailableCategories(violations: FullCheckerSingleResult[]) {
-        const tags: { name: string; selected: boolean }[] = [];
-        for (const v of violations) {
-            for (const t of v.tags) {
-                if (tags.every((tag) => tag.name !== t)) {
-                    tags.push({ name: t, selected: true });
-                }
-            }
+    applyFilter(url: string): void {
+        if (this.chosenFilters?.includes(url)) {
+            this.removeFilter(url);
+        } else {
+            this.chosenFilters.push(url);
+            this.chosenFilters = [...this.chosenFilters];
         }
-        // this.test.next(tags);
     }
 
-    applyFilter(url: string): void {
-        this.chosenFilter = url;
+    removeFilter(filter: string): void {
+        this.chosenFilters?.forEach((item, index) => {
+            if (item === filter) this.chosenFilters?.splice(index, 1);
+        });
+        this.chosenFilters = [...this.chosenFilters];
     }
 }
