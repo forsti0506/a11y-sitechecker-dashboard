@@ -6,15 +6,5 @@
     "umdModuleIds": {
       "angular-highcharts": "angular-highcharts"
     }
-  },
-  "whitelistedNonPeerDependencies": [
-    "a11y-sitechecker",
-    "angular-highcharts",
-    "chalk",
-    "commander",
-    "highcharts",
-    "mongodb",
-    "uuid",
-    "axe-core"
-  ]
+  }
 }

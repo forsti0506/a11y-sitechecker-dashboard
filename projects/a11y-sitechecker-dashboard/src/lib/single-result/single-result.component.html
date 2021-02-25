@@ -26,12 +26,12 @@
                         <code *ngFor="let target of node.targetResult.target" class="mr-3">{{target}}</code>
     </span></div>
     <div class="m-1">HTML: <code>{{node.html}}</code></div>
-    <button (click)="(node['openImage'] = false) && (node['openAdvices'] = false) && (node.targetResult['open'] = !node.targetResult['open'])" mat-stroked-button class="mr-1">Show Urls
+    <button (click)="openUrls(node)" mat-stroked-button class="mr-1">Show Urls
       ({{node.targetResult.urls.length}})
     </button>
-      <button (click)="(node['openImage'] = !node['openImage']) && (node['openAdvices'] = false) && (node.targetResult['open'] = false)" mat-stroked-button>Show related image
+      <button (click)="openImage(node)" mat-stroked-button>Show related image
       </button>
-    <button (click)="(node['openImage'] = false) && (node['openAdvices'] = !node['openAdvices']) && (node.targetResult['open'] = false)" mat-stroked-button>Show Advices for Fixes
+    <button (click)="openAdvices(node)" mat-stroked-button>Show Advices to fix
     </button>
       <mat-card *ngIf="node['openImage']">
         <mat-card-content>

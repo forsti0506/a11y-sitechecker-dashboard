@@ -2,18 +2,28 @@
   "name": "a11y-sitechecker-dashboard",
   "version": "1.7.0",
   "peerDependencies": {
-    "@angular/animations": "~11.0.5",
-    "@angular/cdk": "^11.0.3",
-    "@angular/common": "~11.0.5",
-    "@angular/compiler": "~11.0.5",
-    "@angular/core": "~11.0.5",
-    "@angular/forms": "~11.0.5",
-    "@angular/material": "^11.0.3",
-    "@angular/platform-browser": "~11.0.5",
-    "@angular/platform-browser-dynamic": "~11.0.5",
-    "@angular/router": "~11.0.5",
-    "rxjs": "~6.6.3",
-    "zone.js": "~0.11.3"
+    "@angular/animations": "~11.2.3",
+    "@angular/cdk": "^11.2.2",
+    "@angular/common": "~11.2.3",
+    "@angular/compiler": "~11.2.3",
+    "@angular/core": "~11.2.3",
+    "@angular/material": "^11.2.2",
+    "@angular/platform-browser": "~11.2.3",
+    "@angular/platform-browser-dynamic": "~11.2.3",
+    "rxjs": "~6.6.6",
+    "zone.js": "~0.11.4",
+    "@types/uuid": "^8.3.0",
+    "a11y-sitechecker": "^1.7.2",
+    "axe-core": "^4.1.2",
+    "angular-highcharts": "^11.2.1",
+    "chalk": "^4.1.0",
+    "commander": "^7.1.0",
+    "highcharts": "^9.0.1",
+    "mongodb": "^3.6.4",
+    "uuid": "^8.3.2"
+  },
+  "dependencies": {
+    "tslib": "^2.1.0"
   },
   "bin": {
     "a11y-sitechecker-dashboard": "./bin/a11y-sitechecker.js"
@@ -25,17 +35,5 @@
   "fesm2015": "fesm2015/a11y-sitechecker-dashboard.js",
   "typings": "a11y-sitechecker-dashboard.d.ts",
   "metadata": "a11y-sitechecker-dashboard.metadata.json",
-  "sideEffects": false,
-  "dependencies": {
-    "@types/uuid": "^8.3.0",
-    "a11y-sitechecker": "^1.7.1",
-    "axe-core": "^4.1.1",
-    "angular-highcharts": "^11.2.1",
-    "chalk": "^4.1.0",
-    "commander": "^6.2.1",
-    "highcharts": "^8.2.2",
-    "mongodb": "^3.6.3",
-    "tslib": "^2.0.0",
-    "uuid": "^8.3.2"
-  }
+  "sideEffects": false
 }

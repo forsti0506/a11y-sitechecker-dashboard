@@ -16,7 +16,7 @@ import { getEscaped } from 'a11y-sitechecker/lib/utils/helper-functions';
 
 const config: DashboardConfig = { json: true, resultsPath: 'results', axeConfig: {}, threshold: 0 };
 
-let analyzedUrl;
+let analyzedUrl: string;
 
 // Here we're using Commander to specify the CLI options
 commander
@@ -30,7 +30,7 @@ commander
     )
     .parse(process.argv);
 
-function setupSiteresult(id, sitecheckerResult: A11ySitecheckerResult): SiteResult {
+function setupSiteresult(id: string, sitecheckerResult: A11ySitecheckerResult): SiteResult {
     return {
         id: id,
         toolOptions: sitecheckerResult.toolOptions,
@@ -52,39 +52,40 @@ function setupSiteresult(id, sitecheckerResult: A11ySitecheckerResult): SiteResu
 
 function defineExtraTags(sitecheckerResult: A11ySitecheckerResult): void {
     if (config.idTags) {
+      let idTags = config.idTags;
         sitecheckerResult.violations.forEach((v) => {
-            if (config?.idTags[v.id]) {
+            if (idTags[v.id]) {
                 if (v.customTags) {
-                    v.customTags.push(...config?.idTags[v.id]);
+                    v.customTags.push(...idTags[v.id]);
                 } else {
-                    v.customTags = config?.idTags[v.id];
+                    v.customTags = idTags[v.id];
                 }
             }
         });
         sitecheckerResult.inapplicable.forEach((v) => {
-            if (config?.idTags[v.id]) {
+            if (idTags[v.id]) {
                 if (v.customTags) {
-                    v.customTags.push(...config?.idTags[v.id]);
+                    v.customTags.push(...idTags[v.id]);
                 } else {
-                    v.customTags = config?.idTags[v.id];
+                    v.customTags = idTags[v.id];
                 }
             }
         });
         sitecheckerResult.incomplete.forEach((v) => {
-            if (config?.idTags[v.id]) {
+            if (idTags[v.id]) {
                 if (v.customTags) {
-                    v.customTags.push(...config?.idTags[v.id]);
+                    v.customTags.push(...idTags[v.id]);
                 } else {
-                    v.customTags = config?.idTags[v.id];
+                    v.customTags = idTags[v.id];
                 }
             }
         });
         sitecheckerResult.passes.forEach((v) => {
-            if (config?.idTags[v.id]) {
+            if (idTags[v.id]) {
                 if (v.customTags) {
-                    v.customTags.push(...config?.idTags[v.id]);
+                    v.customTags.push(...idTags[v.id]);
                 } else {
-                    v.customTags = config?.idTags[v.id];
+                    v.customTags = idTags[v.id];
                 }
             }
         });
@@ -118,9 +119,9 @@ async function setupTimeResults(): Promise<void> {
             const db = client.db('a11y-sitechecker-dashboard');
             const dbSiteResult: AnalyzedSite[] = await db
                 .collection('sites')
-                .find<AnalyzedSite>({ url: sitecheckerResult.url })
+                .find<AnalyzedSite>({ url: sitecheckerResult.url }, {})
                 .toArray();
-            let id;
+            let id: string;
             if (dbSiteResult.length > 0) {
                 id = dbSiteResult[0]._id;
             } else {
@@ -222,8 +223,9 @@ async function setupTimeResults(): Promise<void> {
 }
 
 (async (): Promise<void> => {
-    if (commander.config) {
-        const configFile = JSON.parse(fs.readFileSync(commander.config).toString('utf-8'));
+  const options = commander.opts();
+    if (options.config) {
+        const configFile = JSON.parse(fs.readFileSync(options.config).toString('utf-8'));
         if (configFile.resultsPath && typeof configFile.resultsPath === 'string') {
             config.resultsPath = configFile.resultsPath;
         }

@@ -1,10 +1,10 @@
 import { RunOptions, TestEngine, TestEnvironment, TestRunner } from 'axe-core';
 export interface SiteResult {
     id: string;
-    toolOptions: RunOptions;
-    testEngine: TestEngine;
-    testRunner: TestRunner;
-    testEnvironment: TestEnvironment;
+    toolOptions: RunOptions | undefined;
+    testEngine: TestEngine | undefined;
+    testRunner: TestRunner | undefined;
+    testEnvironment: TestEnvironment | undefined;
     timestamp: string;
     analyzedUrls: string[];
     countViolations: number;

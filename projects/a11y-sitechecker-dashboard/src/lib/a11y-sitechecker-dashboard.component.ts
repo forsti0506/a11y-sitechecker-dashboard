@@ -3,7 +3,8 @@ import { Chart } from 'angular-highcharts';
 import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { A11ySitecheckerDashboardService, AnalyzedSite } from './a11y-sitechecker-dashboard.service';
 import { SiteResult } from './models/site-result';
-import { Observable, Subject } from 'rxjs';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 interface DashboardResult {
     url: string;
@@ -18,6 +19,7 @@ interface DashboardResult {
 export class A11ySitecheckerDashboardComponent implements OnInit {
     @Input()
     serverMode = true;
+    private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
     analyzedSites: AnalyzedSite[] | undefined;
     chart = new Chart({
@@ -55,18 +57,29 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
     ngOnInit(): void {
         this.sitecheckerService.serverMode = this.serverMode;
 
-        this.sitecheckerService.getWebsiteResultsNames().subscribe((sites) => {
-            this.analyzedSites = sites;
-            this.activeLink = sites[0].url;
-            this.siteChanged(sites[0]);
-        });
+        this.sitecheckerService
+            .getWebsiteResultsNames()
+            .pipe(takeUntil(this.destroyed$))
+            .subscribe((sites) => {
+                this.analyzedSites = sites;
+                this.activeLink = sites[0].url;
+                this.siteChanged(sites[0]);
+            });
+    }
+
+    ngOnDestroy() {
+        this.destroyed$.next(true);
+        this.destroyed$.complete();
     }
 
     siteChanged(site: AnalyzedSite): void {
-        this.sitecheckerService.getSiteResults(site).subscribe((s) => {
-            this.results = s;
-            this.updateChart();
-        });
+        this.sitecheckerService
+            .getSiteResults(site)
+            .pipe(takeUntil(this.destroyed$))
+            .subscribe((s) => {
+                this.results = s;
+                this.updateChart();
+            });
     }
 
     updateChart(): void {
@@ -80,7 +93,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         this.chart.removeSeries(0);
         this.results.forEach((f) => {
             dataViolations.push(f.countViolations);
-            this.chart.ref$.subscribe((c) => {
+            this.chart.ref$.pipe(takeUntil(this.destroyed$)).subscribe((c) => {
                 c.xAxis[0].setCategories(c.xAxis[0].categories.concat(new Date(f.timestamp).toLocaleString()));
             });
         });
