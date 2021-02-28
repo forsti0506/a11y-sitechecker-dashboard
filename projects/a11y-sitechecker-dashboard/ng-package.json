@@ -4,7 +4,8 @@
   "lib": {
     "entryFile": "src/public-api.ts",
     "umdModuleIds": {
-      "angular-highcharts": "angular-highcharts"
+      "angular-highcharts": "angular-highcharts",
+      "a11y-sitechecker": "a11y-sitechecker"
     }
   }
 }

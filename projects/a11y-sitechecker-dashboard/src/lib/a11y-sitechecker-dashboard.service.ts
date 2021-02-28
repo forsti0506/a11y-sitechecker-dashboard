@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, zip } from 'rxjs';
+import { merge, Observable, of, zip } from 'rxjs';
 import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { HttpClient } from '@angular/common/http';
 import { SiteResult } from './models/site-result';
-import { mergeMap, publishReplay, refCount } from 'rxjs/operators';
+import { concatAll, map, mergeAll, mergeMap, publishReplay, refCount, switchMap, zipAll } from 'rxjs/operators';
+import { flatMap } from 'rxjs/internal/operators';
 
 export interface AnalyzedSite {
     _id: string;
@@ -35,6 +36,7 @@ export class A11ySitecheckerDashboardService {
             return this.httpClient.get<SiteResult[]>('http://localhost:4201/siteResults/' + site._id);
         } else {
             const result: Observable<SiteResult>[] = [];
+            const i = 0;
             for (const f of site.files) {
                 result.push(this.httpClient.get<SiteResult>(f.replace('src/', '')));
             }
@@ -165,5 +167,40 @@ export class A11ySitecheckerDashboardService {
     }
     getEscaped(link: string): string {
         return link.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>{}\\[\]/]/gi, '_');
+    }
+
+    getViolationCoutings(site: AnalyzedSite): Observable<any[]> {
+        if (this.serverMode) {
+            return this.httpClient.get<Map<string, number>[]>('http://localhost:4201/siteResults/' + site._id);
+        } else {
+            const result: Observable<SiteResult>[] = [];
+            for (const f of site.files) {
+                result.push(this.httpClient.get<SiteResult>(f.replace('src/', '')));
+            }
+
+            return zip(...result).pipe(
+                map((f) =>
+                    f.map((t) => {
+                        return this.httpClient.get<any>(
+                            'assets/results/dashboard/' + this.getEscaped(t.id + t.timestamp) + '_violations.json',
+                        );
+                    }),
+                ),
+                flatMap((f) => zip(...f)),
+            );
+
+            // return of(result)
+            //     .pipe(mergeMap((f) => zip(...f)))
+            //     .pipe(
+            //         flatMap((f) =>
+            //             f.map((t) =>
+            //                 this.httpClient.get<Map<string, number>>(
+            //                     'assets/results/dashboard/' + this.getEscaped(t.id + t.timestamp) + '_violations.json',
+            //                 ),
+            //             ),
+            //         ),
+            //         flatMap((f) => f),
+            //     );
+        }
     }
 }

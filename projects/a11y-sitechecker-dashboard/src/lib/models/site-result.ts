@@ -11,4 +11,10 @@ export interface SiteResult {
     countPasses: number;
     countIncomplete: number;
     countInapplicable: number;
+    tabableImages: UrlWithTabableImages[];
+}
+
+interface UrlWithTabableImages {
+    url: string;
+    images: string[];
 }

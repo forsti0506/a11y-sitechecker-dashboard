@@ -13,7 +13,7 @@
     "rxjs": "~6.6.6",
     "zone.js": "~0.11.4",
     "@types/uuid": "^8.3.0",
-    "a11y-sitechecker": "^1.7.2",
+    "a11y-sitechecker": "^1.8.3",
     "axe-core": "^4.1.2",
     "angular-highcharts": "^11.2.1",
     "chalk": "^4.1.0",

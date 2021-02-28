@@ -21,12 +21,12 @@
   <mat-card-content>
     <div [chart]="chart"></div>
     <mat-tab-group *ngIf="loaded" class="m-5" role="main">
-      <mat-tab *ngFor="let urlResult of results.reverse()" label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}">
+      <mat-tab *ngFor="let urlResult of results.reverse(); let dateTimeIndex = index" label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}">
         <ng-template matTabContent>
           <mat-card class="m-3">
             <mat-card-content>
               <div *ngIf="urlResult.analyzedUrls?.length > 0" class="m-2">Analyzed URLS:
-                <button (click)="urlResult['open'] = !urlResult['open']" class="ml-2" mat-stroked-button>Show Urls
+                <button (click)="urlResult['open'] = !urlResult['open']" class="ml-2" mat-stroked-button>Show Urls &  Filter by them
                   ({{urlResult.analyzedUrls?.length}})
                 </button>
                 <div *ngIf="urlResult['open']">
@@ -47,15 +47,17 @@
                 <strong>orientation-Angle:</strong> {{urlResult.testEnvironment?.orientationAngle}},
                   <strong>orentiation-Type:</strong> {{urlResult.testEnvironment?.orientationType}})
               </div>
+              <button (click)="loadViolationDevelopment()" class="ml-2" mat-stroked-button>Show Violation Development for selected URLS
+              </button>
+              <div [chart]="chartViolationDevelopment"></div>
             </mat-card-content>
           </mat-card>
-
-        <div class="m-2">
-          <mat-chip-list aria-label="Filter" multiple>
-            <!--                  <mat-chip *ngFor="let filter of test$ | async" [selected]="filter.selected" color="primary" (click)="selectFilter(filter)">{{filter.name}}</mat-chip>-->
-          </mat-chip-list>
-        </div>
-        <mat-tab-group class="m-5">
+        <mat-card *ngIf="dateTimeIndex !==0 && !serverMode">
+          <mat-card-content>
+            <b>Detaildaten sind nur für den aktuellsten Eintrag verfügbar!</b>
+          </mat-card-content>
+        </mat-card>
+        <mat-tab-group class="m-5" *ngIf="dateTimeIndex ===0">
           <mat-tab label="violations">
             <ng-template matTabContent>
             <app-single-result [chosenFilter]="chosenFilters" [id]="urlResult.id"
@@ -78,6 +80,17 @@
             <ng-template matTabContent>
             <app-single-result [chosenFilter]="chosenFilters" [id]="urlResult.id"
                                [timestamp]="urlResult.timestamp" type="passes"></app-single-result>
+            </ng-template>
+          </mat-tab>
+          <mat-tab label="Tab Order" [disabled]="dateTimeIndex!==0" aria-label="Show Images to see all actual tabable items on the site. Disabled if not the latest one">
+            <ng-template matTabContent>
+              <mat-expansion-panel *ngFor="let urlImages of urlResult.tabableImages" class="m-2">
+                <mat-expansion-panel-header>{{urlImages.url}}</mat-expansion-panel-header>
+                <div *ngFor="let image of urlImages.images; let i = index">
+                  <b>Image {{++i}} of {{urlImages.images.length}}</b><br>>
+                  <img src="assets/images/{{image}}" alt="Image with clickable Items highlighted">
+                </div>
+              </mat-expansion-panel>
             </ng-template>
           </mat-tab>
 

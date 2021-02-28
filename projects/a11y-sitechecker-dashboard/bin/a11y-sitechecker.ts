@@ -6,7 +6,7 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import { MongoClient } from 'mongodb';
 import { DashboardConfig } from './dashboard-config';
-import { A11ySitecheckerResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { entry } from 'a11y-sitechecker';
 import { setupAxeConfig, setupConfig } from 'a11y-sitechecker/lib/utils/setup-config';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +14,13 @@ import { SiteResult } from '../src/lib/models/site-result';
 import { AnalyzedSite } from '../src/lib/a11y-sitechecker-dashboard.service';
 import { getEscaped } from 'a11y-sitechecker/lib/utils/helper-functions';
 
-const config: DashboardConfig = { json: true, resultsPath: 'results', axeConfig: {}, threshold: 0 };
+interface FileObject {
+    id: string;
+    url: string;
+    files: [string];
+}
+
+const config: DashboardConfig = { json: true, resultsPath: 'results', axeConfig: {}, threshold: 0, timeout: 15000 };
 
 let analyzedUrl: string;
 
@@ -24,7 +30,7 @@ commander
     .usage('[options] <paths>')
     .option('--config <string>', 'Provide a config.json')
     .option(
-        '-T, --threshold <number>',
+        '--threshold <number>',
         'permit this number of errors, warnings, or notices, otherwise fail with exit code 2',
         '0',
     )
@@ -47,12 +53,13 @@ function setupSiteresult(id: string, sitecheckerResult: A11ySitecheckerResult): 
             .map((v) => v.nodes.length)
             .reduce((count, value) => count + value, 0),
         countInapplicable: sitecheckerResult.inapplicable.length,
+        tabableImages: sitecheckerResult.tabableImages,
     };
 }
 
 function defineExtraTags(sitecheckerResult: A11ySitecheckerResult): void {
     if (config.idTags) {
-      let idTags = config.idTags;
+        const idTags = config.idTags;
         sitecheckerResult.violations.forEach((v) => {
             if (idTags[v.id]) {
                 if (v.customTags) {
@@ -94,7 +101,7 @@ function defineExtraTags(sitecheckerResult: A11ySitecheckerResult): void {
 
 async function setupTimeResults(): Promise<void> {
     const sitecheckerResult: A11ySitecheckerResult = await entry(
-        setupConfig(commander),
+        setupConfig(commander.opts()),
         setupAxeConfig(config),
         commander.args[0],
         true,
@@ -182,8 +189,8 @@ async function setupTimeResults(): Promise<void> {
         const fileToSave = 'src/assets/results/dashboard/' + dateToSave + '.json';
 
         fs.readFile('src/assets/results/dashboard/files.json', async (err, data) => {
-            let fileObject;
-            let id;
+            let fileObject: FileObject[];
+            let id: string;
             if (err) {
                 id = uuidv4();
                 fileObject = [{ id: id, url: analyzedUrl, files: [fileToSave] }];
@@ -216,14 +223,62 @@ async function setupTimeResults(): Promise<void> {
 
             const inapplicablesPath =
                 'src/assets/results/dashboard/' + getEscaped(id + sitecheckerResult.timestamp) + '_inapplicables.json';
-
             await fs.promises.writeFile(inapplicablesPath, JSON.stringify(sitecheckerResult.inapplicable, null, 4));
+
+            if (true) {
+                const filesJson = JSON.parse(fs.readFileSync('src/assets/results/dashboard/files.json').toString());
+                const relatedFiles = filesJson.filter((f) => f.id === id)[0].files;
+                if (relatedFiles.length > 1) {
+                    let i = 0;
+                    for (const file of relatedFiles) {
+                        if (i < relatedFiles.length - 1) {
+                            const resultFile: SiteResult = JSON.parse(fs.readFileSync(file).toString());
+                            await getCountings(id, resultFile.timestamp, '_violations.json');
+                            await getCountings(id, resultFile.timestamp, '_passes.json');
+                            await getCountings(id, resultFile.timestamp, '_incompletes.json');
+                            await getCountings(id, resultFile.timestamp, '_inapplicables.json');
+                        }
+                        i++;
+                    }
+                }
+            }
         });
     }
 }
 
+async function getCountings(id: string, timestamp: string, fileEnding: string): Promise<void> {
+    const violationsResultFile: FullCheckerSingleResult[] | Map<string, number> = JSON.parse(
+        fs.readFileSync('src/assets/results/dashboard/' + getEscaped(id + timestamp) + fileEnding).toString(),
+    );
+    const violationCountingsByUrl: Map<string, number> = new Map<string, number>();
+    if ((violationsResultFile as FullCheckerSingleResult[])[0]?.id !== undefined) {
+        for (const fullCheckerSingleResult of violationsResultFile) {
+            (fullCheckerSingleResult as FullCheckerSingleResult).nodes.forEach((node) =>
+                node.targetResult.urls.forEach((u) => {
+                    const elment = violationCountingsByUrl.get(u);
+                    if (elment) {
+                        violationCountingsByUrl.set(u, elment + 1);
+                    } else {
+                        violationCountingsByUrl.set(u, 1);
+                    }
+                }),
+            );
+        }
+        const jsonmap: { [key: string]: number } = {};
+        violationCountingsByUrl.forEach((value, key) => {
+            jsonmap[key] = value;
+        });
+        await fs.promises.writeFile(
+            'src/assets/results/dashboard/' + getEscaped(id + timestamp) + fileEnding,
+            JSON.stringify(jsonmap, null, 4),
+        );
+    } else {
+        return;
+    }
+}
+
 (async (): Promise<void> => {
-  const options = commander.opts();
+    const options = commander.opts();
     if (options.config) {
         const configFile = JSON.parse(fs.readFileSync(options.config).toString('utf-8'));
         if (configFile.resultsPath && typeof configFile.resultsPath === 'string') {

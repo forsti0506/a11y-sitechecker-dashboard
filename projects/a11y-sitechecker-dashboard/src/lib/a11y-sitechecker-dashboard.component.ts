@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Chart } from 'angular-highcharts';
-import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { A11ySitecheckerResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { A11ySitecheckerDashboardService, AnalyzedSite } from './a11y-sitechecker-dashboard.service';
 import { SiteResult } from './models/site-result';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 interface DashboardResult {
@@ -35,6 +35,29 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         },
         title: {
             text: 'Overview',
+        },
+
+        credits: {
+            enabled: false,
+        },
+        xAxis: {
+            categories: [],
+        },
+    });
+
+    chartViolationDevelopment = new Chart({
+        chart: {
+            type: 'line',
+        },
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true,
+                },
+            },
+        },
+        title: {
+            text: 'Violation Development',
         },
 
         credits: {
@@ -87,6 +110,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         const dataIncomplete: number[] = [];
         const dataInapplicable: number[] = [];
         const dataPasses: number[] = [];
+        const dataAnalyzedUrls: number[] = [];
         this.chart.removeSeries(0);
         this.chart.removeSeries(0);
         this.chart.removeSeries(0);
@@ -105,6 +129,9 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         });
         this.results.forEach((f) => {
             dataPasses.push(f.countPasses);
+        });
+        this.results.forEach((f) => {
+            dataAnalyzedUrls.push(f.analyzedUrls.length);
         });
         this.chart.addSeries(
             {
@@ -148,8 +175,18 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
             true,
             true,
         );
+
+        this.chart.addSeries(
+            {
+                name: 'analyzedUrls',
+                type: 'line',
+                data: dataAnalyzedUrls,
+                color: 'black',
+            },
+            true,
+            true,
+        );
         this.loaded = true;
-        // this.loadAvailableCategories(this.results[0].violations);
     }
 
     sortResultByDate(results: DashboardResult[]): A11ySitecheckerResult[] {
@@ -176,5 +213,46 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
             if (item === filter) this.chosenFilters?.splice(index, 1);
         });
         this.chosenFilters = [...this.chosenFilters];
+    }
+
+    loadViolationDevelopment() {
+        if (this.analyzedSites) {
+            const data = [];
+            this.sitecheckerService.getViolationCoutings(this.analyzedSites[0]).subscribe((f) => {
+                const violationsMap: Map<string, number>[] = [];
+                for (const a of f) {
+                    const aMap: Map<string, number> = new Map<string, number>();
+                    for (const value in a) {
+                        aMap.set(value, a[value]);
+                    }
+                    violationsMap.push(aMap);
+                }
+
+                const mappinger: Map<string, number[]> = new Map<string, number[]>();
+                let i = 0;
+                for (const v of violationsMap) {
+                    if (i < violationsMap.length - 1) {
+                        v.forEach((b: number, k: string) => {
+                            const current = mappinger.get(k);
+                            if (current) {
+                                current.push(b);
+                            } else {
+                                const filledNumbers = [];
+                                for (let j = 0; j < i - 1; j++) {
+                                    filledNumbers.push(0);
+                                }
+                                filledNumbers.push(b);
+                                mappinger.set(k, filledNumbers);
+                            }
+                        });
+                        mappinger.forEach((b, key) => {
+                            if (b.length < i) b.push(0);
+                        });
+                        i++;
+                    }
+                }
+                debugger;
+            });
+        }
     }
 }
