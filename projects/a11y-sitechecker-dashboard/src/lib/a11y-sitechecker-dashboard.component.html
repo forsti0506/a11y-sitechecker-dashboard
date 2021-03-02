@@ -19,6 +19,14 @@
 </nav>
 <mat-card class="m-5">
   <mat-card-content>
+    <mat-button-toggle-group (change)="loadViolationDevelopment($event)" value="{{showChart}}">
+      <mat-button-toggle value="general">
+        Show general overview
+      </mat-button-toggle>
+      <mat-button-toggle value="violations">
+        Show Violations by url
+      </mat-button-toggle>
+    </mat-button-toggle-group>
     <div [chart]="chart"></div>
     <mat-tab-group *ngIf="loaded" class="m-5" role="main">
       <mat-tab *ngFor="let urlResult of results.reverse(); let dateTimeIndex = index" label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}">
@@ -47,9 +55,6 @@
                 <strong>orientation-Angle:</strong> {{urlResult.testEnvironment?.orientationAngle}},
                   <strong>orentiation-Type:</strong> {{urlResult.testEnvironment?.orientationType}})
               </div>
-              <button (click)="loadViolationDevelopment()" class="ml-2" mat-stroked-button>Show Violation Development for selected URLS
-              </button>
-              <div [chart]="chartViolationDevelopment"></div>
             </mat-card-content>
           </mat-card>
         <mat-card *ngIf="dateTimeIndex !==0 && !serverMode">
@@ -87,7 +92,7 @@
               <mat-expansion-panel *ngFor="let urlImages of urlResult.tabableImages" class="m-2">
                 <mat-expansion-panel-header>{{urlImages.url}}</mat-expansion-panel-header>
                 <div *ngFor="let image of urlImages.images; let i = index">
-                  <b>Image {{++i}} of {{urlImages.images.length}}</b><br>>
+                  <b>Image {{i + 1}} of {{urlImages.images.length}}</b><br>
                   <img src="assets/images/{{image}}" alt="Image with clickable Items highlighted">
                 </div>
               </mat-expansion-panel>

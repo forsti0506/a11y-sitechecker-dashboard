@@ -1,10 +1,16 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Chart } from 'angular-highcharts';
-import { A11ySitecheckerResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import {
+    A11ySitecheckerResult,
+    FullCheckerSingleResult,
+    NodeResult,
+    Result,
+} from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { A11ySitecheckerDashboardService, AnalyzedSite } from './a11y-sitechecker-dashboard.service';
 import { SiteResult } from './models/site-result';
 import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 interface DashboardResult {
     url: string;
@@ -16,15 +22,17 @@ interface DashboardResult {
     styleUrls: ['./a11y-sitechecker-dashboard.component.css'],
     encapsulation: ViewEncapsulation.None,
 })
-export class A11ySitecheckerDashboardComponent implements OnInit {
+export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
     @Input()
     serverMode = true;
+    showChart = 'general';
     private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
     analyzedSites: AnalyzedSite[] | undefined;
     chart = new Chart({
         chart: {
             type: 'line',
+            height: '20%',
         },
         plotOptions: {
             line: {
@@ -36,30 +44,6 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         title: {
             text: 'Overview',
         },
-
-        credits: {
-            enabled: false,
-        },
-        xAxis: {
-            categories: [],
-        },
-    });
-
-    chartViolationDevelopment = new Chart({
-        chart: {
-            type: 'line',
-        },
-        plotOptions: {
-            line: {
-                dataLabels: {
-                    enabled: true,
-                },
-            },
-        },
-        title: {
-            text: 'Violation Development',
-        },
-
         credits: {
             enabled: false,
         },
@@ -90,7 +74,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
             });
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroyed$.next(true);
         this.destroyed$.complete();
     }
@@ -111,82 +95,94 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         const dataInapplicable: number[] = [];
         const dataPasses: number[] = [];
         const dataAnalyzedUrls: number[] = [];
-        this.chart.removeSeries(0);
-        this.chart.removeSeries(0);
-        this.chart.removeSeries(0);
-        this.chart.removeSeries(0);
-        this.results.forEach((f) => {
-            dataViolations.push(f.countViolations);
-            this.chart.ref$.pipe(takeUntil(this.destroyed$)).subscribe((c) => {
-                c.xAxis[0].setCategories(c.xAxis[0].categories.concat(new Date(f.timestamp).toLocaleString()));
+        this.chart.ref$.pipe(takeUntil(this.destroyed$)).subscribe((c) => {
+            while (c.series.length > 0) {
+                c.series[0].remove();
+            }
+            this.results.forEach((f) => {
+                c.title.update({ text: 'General overview' }, false);
+                dataViolations.push(f.countViolations);
+                const dateTime = new Date(f.timestamp);
+                c.xAxis[0].setCategories(
+                    c.xAxis[0].categories.concat(
+                        dateTime.getDate().toString().padStart(2, '0') +
+                            '.' +
+                            (dateTime.getMonth() + 1).toString().padStart(2, '0') +
+                            ' ' +
+                            dateTime.getHours().toString().padStart(2, '0') +
+                            ':' +
+                            dateTime.getMinutes().toString().padStart(2, '0'),
+                    ),
+                    false,
+                );
             });
-        });
-        this.results.forEach((f) => {
-            dataIncomplete.push(f.countIncomplete);
-        });
-        this.results.forEach((f) => {
-            dataInapplicable.push(f.countInapplicable);
-        });
-        this.results.forEach((f) => {
-            dataPasses.push(f.countPasses);
-        });
-        this.results.forEach((f) => {
-            dataAnalyzedUrls.push(f.analyzedUrls.length);
-        });
-        this.chart.addSeries(
-            {
-                name: 'violations',
-                type: 'line',
-                data: dataViolations,
-                color: 'red',
-            },
-            true,
-            true,
-        );
-        this.chart.addSeries(
-            {
-                name: 'incomplete',
-                type: 'line',
-                data: dataIncomplete,
-                color: 'orange',
-            },
-            true,
-            true,
-        );
-        this.chart.addSeries(
-            {
-                name: 'inapplicable',
-                type: 'line',
-                data: dataInapplicable,
-                color: 'blue',
-                visible: false,
-            },
-            true,
-            true,
-        );
-        this.chart.addSeries(
-            {
-                name: 'passes',
-                type: 'line',
-                data: dataPasses,
-                color: 'green',
-                visible: false,
-            },
-            true,
-            true,
-        );
+            this.results.forEach((f) => {
+                dataIncomplete.push(f.countIncomplete);
+            });
+            this.results.forEach((f) => {
+                dataInapplicable.push(f.countInapplicable);
+            });
+            this.results.forEach((f) => {
+                dataPasses.push(f.countPasses);
+            });
+            this.results.forEach((f) => {
+                dataAnalyzedUrls.push(f.analyzedUrls.length);
+            });
+            this.chart.addSeries(
+                {
+                    name: 'violations',
+                    type: 'line',
+                    data: dataViolations,
+                    color: 'red',
+                },
+                true,
+                true,
+            );
+            this.chart.addSeries(
+                {
+                    name: 'incomplete',
+                    type: 'line',
+                    data: dataIncomplete,
+                    color: 'orange',
+                },
+                true,
+                true,
+            );
+            this.chart.addSeries(
+                {
+                    name: 'inapplicable',
+                    type: 'line',
+                    data: dataInapplicable,
+                    color: 'blue',
+                    visible: false,
+                },
+                true,
+                true,
+            );
+            this.chart.addSeries(
+                {
+                    name: 'passes',
+                    type: 'line',
+                    data: dataPasses,
+                    color: 'green',
+                    visible: false,
+                },
+                true,
+                true,
+            );
 
-        this.chart.addSeries(
-            {
-                name: 'analyzedUrls',
-                type: 'line',
-                data: dataAnalyzedUrls,
-                color: 'black',
-            },
-            true,
-            true,
-        );
-        this.loaded = true;
+            this.chart.addSeries(
+                {
+                    name: 'analyzedUrls',
+                    type: 'line',
+                    data: dataAnalyzedUrls,
+                    color: 'black',
+                },
+                true,
+                true,
+            );
+            this.loaded = true;
+        });
     }
 
     sortResultByDate(results: DashboardResult[]): A11ySitecheckerResult[] {
@@ -215,44 +211,94 @@ export class A11ySitecheckerDashboardComponent implements OnInit {
         this.chosenFilters = [...this.chosenFilters];
     }
 
-    loadViolationDevelopment() {
-        if (this.analyzedSites) {
-            const data = [];
-            this.sitecheckerService.getViolationCoutings(this.analyzedSites[0]).subscribe((f) => {
-                const violationsMap: Map<string, number>[] = [];
-                for (const a of f) {
-                    const aMap: Map<string, number> = new Map<string, number>();
-                    for (const value in a) {
-                        aMap.set(value, a[value]);
-                    }
-                    violationsMap.push(aMap);
-                }
-
-                const mappinger: Map<string, number[]> = new Map<string, number[]>();
-                let i = 0;
-                for (const v of violationsMap) {
-                    if (i < violationsMap.length - 1) {
-                        v.forEach((b: number, k: string) => {
-                            const current = mappinger.get(k);
-                            if (current) {
-                                current.push(b);
-                            } else {
-                                const filledNumbers = [];
-                                for (let j = 0; j < i - 1; j++) {
-                                    filledNumbers.push(0);
-                                }
-                                filledNumbers.push(b);
-                                mappinger.set(k, filledNumbers);
+    loadViolationDevelopment(event: MatButtonToggleChange): void {
+        if (event.value === 'general') {
+            this.updateChart();
+        } else {
+            if (this.analyzedSites) {
+                this.chart.ref$
+                    .pipe(
+                        map((c) => {
+                            c.title.update({ text: 'Violations by Url' }, false);
+                            while (c.series.length > 0) {
+                                c.series[0].remove();
                             }
-                        });
-                        mappinger.forEach((b, key) => {
-                            if (b.length < i) b.push(0);
-                        });
-                        i++;
-                    }
-                }
-                debugger;
-            });
+                        }),
+                        mergeMap(() =>
+                            this.sitecheckerService
+                                .getViolationCoutings(this.analyzedSites?.filter((f) => f.url === this.activeLink)[0])
+                                .pipe(takeUntil(this.destroyed$))
+                                .pipe(
+                                    switchMap((f) => {
+                                        const violationsMap: Map<string, number>[] = [];
+                                        let i = 1;
+                                        for (const a of f) {
+                                            if (i === f.length) {
+                                                const aMap: Map<string, number> = new Map<string, number>();
+                                                for (const elem of a) {
+                                                    elem.nodes.forEach((node: NodeResult) => {
+                                                        node.targetResult.urls.forEach((t: string) => {
+                                                            const entry = aMap.get(t);
+                                                            if (entry) {
+                                                                aMap.set(t, entry + 1);
+                                                            } else {
+                                                                aMap.set(t, 1);
+                                                            }
+                                                        });
+                                                    });
+                                                }
+                                                violationsMap.push(aMap);
+                                            } else {
+                                                const aMap: Map<string, number> = new Map<string, number>();
+                                                for (const value in a) {
+                                                    aMap.set(value, a[value]);
+                                                }
+                                                violationsMap.push(aMap);
+                                                i++;
+                                            }
+                                        }
+                                        i = 0;
+                                        const mappinger: Map<string, number[]> = new Map<string, number[]>();
+                                        for (const v of violationsMap) {
+                                            v.forEach((b: number, k: string) => {
+                                                const current = mappinger.get(k);
+                                                if (current) {
+                                                    current.push(b);
+                                                } else {
+                                                    const filledNumbers = [];
+                                                    for (let j = 0; j < i - 1; j++) {
+                                                        filledNumbers.push(0);
+                                                    }
+                                                    filledNumbers.push(b);
+                                                    mappinger.set(k, filledNumbers);
+                                                }
+                                            });
+                                            i++;
+                                            mappinger.forEach((b, key) => {
+                                                if (b.length < i) b.push(0);
+                                            });
+                                        }
+                                        mappinger.forEach((k, v) => {
+                                            this.chart.addSeries(
+                                                {
+                                                    name: v,
+                                                    type: 'line',
+                                                    data: k,
+                                                    visible: false,
+                                                },
+                                                false,
+                                                false,
+                                            );
+                                        });
+                                        return this.chart.ref$;
+                                    }),
+                                ),
+                        ),
+                    )
+                    .subscribe((c1) => {
+                        c1.redraw();
+                    });
+            }
         }
     }
 }

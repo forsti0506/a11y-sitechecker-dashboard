@@ -14,6 +14,7 @@ import { SingleResultComponent } from './single-result/single-result.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatListModule } from '@angular/material/list';
 import { SortByImpactPipe } from './sortByImpact.pipe';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
     declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, SortByImpactPipe],
@@ -30,6 +31,7 @@ import { SortByImpactPipe } from './sortByImpact.pipe';
         MatBadgeModule,
         MatChipsModule,
         MatListModule,
+        MatButtonToggleModule,
     ],
     exports: [A11ySitecheckerDashboardComponent],
     providers: [SortByImpactPipe],

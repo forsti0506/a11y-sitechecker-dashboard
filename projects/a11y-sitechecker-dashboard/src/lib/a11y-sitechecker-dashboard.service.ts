@@ -169,10 +169,10 @@ export class A11ySitecheckerDashboardService {
         return link.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>{}\\[\]/]/gi, '_');
     }
 
-    getViolationCoutings(site: AnalyzedSite): Observable<any[]> {
-        if (this.serverMode) {
+    getViolationCoutings(site: AnalyzedSite | undefined): Observable<any[]> {
+        if (this.serverMode && site) {
             return this.httpClient.get<Map<string, number>[]>('http://localhost:4201/siteResults/' + site._id);
-        } else {
+        } else if (site) {
             const result: Observable<SiteResult>[] = [];
             for (const f of site.files) {
                 result.push(this.httpClient.get<SiteResult>(f.replace('src/', '')));
@@ -188,19 +188,7 @@ export class A11ySitecheckerDashboardService {
                 ),
                 flatMap((f) => zip(...f)),
             );
-
-            // return of(result)
-            //     .pipe(mergeMap((f) => zip(...f)))
-            //     .pipe(
-            //         flatMap((f) =>
-            //             f.map((t) =>
-            //                 this.httpClient.get<Map<string, number>>(
-            //                     'assets/results/dashboard/' + this.getEscaped(t.id + t.timestamp) + '_violations.json',
-            //                 ),
-            //             ),
-            //         ),
-            //         flatMap((f) => f),
-            //     );
         }
+        return of();
     }
 }
