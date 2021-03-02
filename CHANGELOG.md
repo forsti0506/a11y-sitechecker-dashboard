@@ -1,3 +1,11 @@
+## [1.8.1](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.8.0...v1.8.1) (2021-03-02)
+
+
+### Bug Fixes
+
+* axe version ([8d26ce0](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/8d26ce0d5835545309c1499261fee39c4b97ae74))
+* fixed charts ([17c5874](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/17c58747ef1685af52b87dd554216dfee38e0339))
+
 # [1.8.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.7.2...v1.8.0) (2021-02-28)
 
 
