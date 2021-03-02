@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.7.2...v1.8.0) (2021-02-28)
+
+
+### Features
+
+* many improvements. Version not stable ([520793e](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/520793e0c5090aeb6e73e31b49904f957565bd71))
+
 ## [1.7.2](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.7.1...v1.7.2) (2021-02-25)
 
 
