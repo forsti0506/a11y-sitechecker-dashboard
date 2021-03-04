@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { merge, Observable, of, zip } from 'rxjs';
+import { Observable, of, zip } from 'rxjs';
 import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { HttpClient } from '@angular/common/http';
 import { SiteResult } from './models/site-result';
-import { concatAll, map, mergeAll, mergeMap, publishReplay, refCount, switchMap, zipAll } from 'rxjs/operators';
-import { flatMap } from 'rxjs/internal/operators';
+import { map, mergeMap, publishReplay, refCount } from 'rxjs/operators';
 
 export interface AnalyzedSite {
     _id: string;
@@ -186,7 +185,7 @@ export class A11ySitecheckerDashboardService {
                         );
                     }),
                 ),
-                flatMap((f) => zip(...f)),
+                mergeMap((f) => zip(...f)),
             );
         }
         return of();

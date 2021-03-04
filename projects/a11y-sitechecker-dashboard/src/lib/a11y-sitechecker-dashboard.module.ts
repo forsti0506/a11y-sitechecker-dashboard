@@ -15,6 +15,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatListModule } from '@angular/material/list';
 import { SortByImpactPipe } from './sortByImpact.pipe';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
     declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, SortByImpactPipe],
@@ -32,6 +33,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
         MatChipsModule,
         MatListModule,
         MatButtonToggleModule,
+        MatProgressSpinnerModule,
     ],
     exports: [A11ySitecheckerDashboardComponent],
     providers: [SortByImpactPipe],

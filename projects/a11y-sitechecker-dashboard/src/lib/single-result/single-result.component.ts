@@ -4,6 +4,7 @@ import { A11ySitecheckerDashboardService } from '../a11y-sitechecker-dashboard.s
 import { SortByImpactPipe } from '../sortByImpact.pipe';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { SiteResult } from '../models/site-result';
 
 @Component({
     selector: 'app-single-result',
@@ -72,5 +73,9 @@ export class SingleResultComponent implements OnInit {
         node['openAdvices'] = !node['openAdvices'];
         node['openImage'] = false;
         node.targetResult['open'] = false;
+    }
+
+    trackByFullCheckerSingleResult(index: number, fullCheckerSingleResult: FullCheckerSingleResult): string {
+        return fullCheckerSingleResult.id;
     }
 }

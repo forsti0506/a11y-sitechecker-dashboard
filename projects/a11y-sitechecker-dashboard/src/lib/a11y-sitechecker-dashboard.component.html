@@ -2,7 +2,7 @@
   <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
     <mat-icon>menu</mat-icon>
   </button>
-  <h1>A11y-Siteckecker Dashboard</h1>
+  <h1>A11y-Sitechecker Dashboard</h1>
   <span class="example-spacer"></span>
   <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
     <mat-icon>favorite</mat-icon>
@@ -11,9 +11,8 @@
     <mat-icon>share</mat-icon>
   </button>
 </mat-toolbar>
-
 <nav class="m-5" mat-tab-nav-bar>
-  <a (click)="(activeLink = site.url) && siteChanged(site)" *ngFor="let site of analyzedSites"
+  <a (click)="(activeLink = site.url) && siteChanged(site)" *ngFor="let site of analyzedSites; trackBy: trackBySiteId"
      [active]="activeLink == site.url"
      mat-tab-link> {{site.url}} </a>
 </nav>
@@ -29,21 +28,16 @@
     </mat-button-toggle-group>
     <div [chart]="chart"></div>
     <mat-tab-group *ngIf="loaded" class="m-5" role="main">
-      <mat-tab *ngFor="let urlResult of results.reverse(); let dateTimeIndex = index" label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}">
+      <mat-tab *ngFor="let urlResult of results.reverse(); let dateTimeIndex = index; trackBy: trackBySiteResult" label="{{urlResult.timestamp | date: 'dd.MM.yy HH:mm'}}">
         <ng-template matTabContent>
           <mat-card class="m-3">
             <mat-card-content>
               <div *ngIf="urlResult.analyzedUrls?.length > 0" class="m-2">Analyzed URLS:
-                <button (click)="urlResult['open'] = !urlResult['open']" class="ml-2" mat-stroked-button>Show Urls &  Filter by them
-                  ({{urlResult.analyzedUrls?.length}})
-                </button>
-                <div *ngIf="urlResult['open']">
                   <mat-chip-list aria-label="Filter by urls!" multiple>
-                  <mat-chip (click)="applyFilter(url)" *ngFor="let url of urlResult.analyzedUrls" [selected]="this.chosenFilters?.includes(url)"
+                  <mat-chip (click)="applyFilter(url)" *ngFor="let url of urlResult.analyzedUrls;" [selected]="this.chosenFilters?.includes(url)"
                             class="m-1">
                     {{url}}
                   </mat-chip></mat-chip-list>
-                </div>
               </div>
               <div class="m-2"><strong>TestEngine:</strong> {{urlResult.testEngine?.name}}
                 ({{urlResult.testEngine?.version}})

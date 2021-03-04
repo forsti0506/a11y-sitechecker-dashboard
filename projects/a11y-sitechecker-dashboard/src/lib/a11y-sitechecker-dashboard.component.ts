@@ -1,11 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Chart } from 'angular-highcharts';
-import {
-    A11ySitecheckerResult,
-    FullCheckerSingleResult,
-    NodeResult,
-    Result,
-} from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { A11ySitecheckerResult, NodeResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 import { A11ySitecheckerDashboardService, AnalyzedSite } from './a11y-sitechecker-dashboard.service';
 import { SiteResult } from './models/site-result';
 import { ReplaySubject } from 'rxjs';
@@ -135,7 +130,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
                     data: dataViolations,
                     color: 'red',
                 },
-                true,
+                false,
                 true,
             );
             this.chart.addSeries(
@@ -145,7 +140,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
                     data: dataIncomplete,
                     color: 'orange',
                 },
-                true,
+                false,
                 true,
             );
             this.chart.addSeries(
@@ -156,7 +151,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
                     color: 'blue',
                     visible: false,
                 },
-                true,
+                false,
                 true,
             );
             this.chart.addSeries(
@@ -167,7 +162,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
                     color: 'green',
                     visible: false,
                 },
-                true,
+                false,
                 true,
             );
 
@@ -300,5 +295,13 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
                     });
             }
         }
+    }
+
+    trackBySiteId(index: number, analyzedSite: AnalyzedSite): string {
+        return analyzedSite._id;
+    }
+
+    trackBySiteResult(index: number, siteResult: SiteResult): string {
+        return siteResult.id;
     }
 }

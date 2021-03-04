@@ -24,7 +24,7 @@
     "@angular/material": "^11.2.2",
     "@angular/platform-browser": "~11.2.3",
     "@angular/platform-browser-dynamic": "~11.2.3",
-    "a11y-sitechecker": "^1.9.2",
+    "a11y-sitechecker": "^1.11.0",
     "angular-highcharts": "^11.2.1",
     "chalk": "^4.1.0",
     "commander": "^7.1.0",
