@@ -1,6 +1,6 @@
 {
   "name": "a11y-sitechecker-dashboard",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "peerDependencies": {
     "@angular/animations": "~11.2.3",
     "@angular/cdk": "^11.2.2",
