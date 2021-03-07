@@ -1,0 +1,19 @@
+<mat-toolbar color="primary" role="banner" *ngIf="showToolbar">
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <h1>A11y-Sitechecker Dashboard</h1>
+  <mat-form-field appearance="outline" class="pt-3">
+    <mat-label>Sites</mat-label>
+    <select matNativeControl required (change)="changeSite($event.target?.value)">
+      <option *ngFor="let site of analyzedSites; trackBy: trackBySiteId; let i = index" [value]="i" class="sitechooser-panel">{{site.url}}</option>
+    </select>
+  </mat-form-field>
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
+    <mat-icon>favorite</mat-icon>
+  </button>
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
+    <mat-icon>share</mat-icon>
+  </button>
+</mat-toolbar>
