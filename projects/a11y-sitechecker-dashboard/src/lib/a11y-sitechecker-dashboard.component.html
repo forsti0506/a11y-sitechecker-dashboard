@@ -1,8 +1,14 @@
-<mat-toolbar color="primary" role="banner">
+<mat-toolbar color="primary" role="banner" *ngIf="showToolbar">
   <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
     <mat-icon>menu</mat-icon>
   </button>
   <h1>A11y-Sitechecker Dashboard</h1>
+  <mat-form-field appearance="outline" class="pt-3">
+    <mat-label>Sites</mat-label>
+    <select matNativeControl required (change)="siteChanged($event.target?.value)">
+      <option *ngFor="let site of analyzedSites; trackBy: trackBySiteId; let i = index" [value]="i" class="sitechooser-panel">{{site.url}}</option>
+    </select>
+  </mat-form-field>
   <span class="example-spacer"></span>
   <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
     <mat-icon>favorite</mat-icon>
@@ -11,12 +17,8 @@
     <mat-icon>share</mat-icon>
   </button>
 </mat-toolbar>
-<nav class="m-5" mat-tab-nav-bar>
-  <a (click)="(activeLink = site.url) && siteChanged(site)" *ngFor="let site of analyzedSites; trackBy: trackBySiteId"
-     [active]="activeLink == site.url"
-     mat-tab-link> {{site.url}} </a>
-</nav>
-<mat-card class="m-5">
+<app-loading [loaded]="this.loaded"></app-loading>
+<mat-card class="m-5" *ngIf="loaded">
   <mat-card-content>
     <mat-button-toggle-group (change)="loadViolationDevelopment($event)" value="{{showChart}}">
       <mat-button-toggle value="general">
@@ -56,11 +58,11 @@
             <b>Detaildaten sind nur für den aktuellsten Eintrag verfügbar!</b>
           </mat-card-content>
         </mat-card>
-        <mat-tab-group class="m-5" *ngIf="dateTimeIndex ===0">
+        <mat-tab-group class="m-5" *ngIf="dateTimeIndex ===0" fixedScrollingDirective>
           <mat-tab label="violations">
             <ng-template matTabContent>
             <app-single-result [chosenFilter]="chosenFilters" [id]="urlResult.id"
-                               [timestamp]="urlResult.timestamp" class="m-5" type="violations"></app-single-result>
+                               [timestamp]="urlResult.timestamp" type="violations"></app-single-result>
             </ng-template>
           </mat-tab>
           <mat-tab label="incomplete">
@@ -100,7 +102,9 @@
     </mat-tab-group>
 
   </mat-card-content>
-  <mat-card-footer role="contentinfo">
-    Footer
-  </mat-card-footer>
 </mat-card>
+<mat-toolbar color="primary" role="contentinfo" *ngIf="showFooter && loaded">
+  <div style="margin: auto;">The A11y-sitechecker-dashboard is programmed by Martin Forstner. Details can be found on: <a href="https://github.com/forsti0506/a11y-sitechecker-dashboard">Github</a>
+  </div>
+
+</mat-toolbar>

@@ -1,16 +1,12 @@
 import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Chart } from 'angular-highcharts';
-import { A11ySitecheckerResult, NodeResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
-import { A11ySitecheckerDashboardService, AnalyzedSite } from './a11y-sitechecker-dashboard.service';
+import { NodeResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { A11ySitecheckerDashboardService, AnalyzedSite } from './services/a11y-sitechecker-dashboard.service';
 import { SiteResult } from './models/site-result';
 import { ReplaySubject } from 'rxjs';
 import { map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
-interface DashboardResult {
-    url: string;
-    results: A11ySitecheckerResult[];
-}
 @Component({
     selector: 'sitechecker-dashboard',
     templateUrl: './a11y-sitechecker-dashboard.component.html',
@@ -20,6 +16,11 @@ interface DashboardResult {
 export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
     @Input()
     serverMode = true;
+    @Input()
+    showToolbar = true;
+    @Input()
+    showFooter = true;
+
     showChart = 'general';
     private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
@@ -49,8 +50,9 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
 
     results: SiteResult[] = [];
     loaded = false;
-    activeLink: string | undefined;
+    activeUrl: string | undefined;
     chosenFilters: string[] = [];
+    selectedSite = 'okay';
 
     constructor(private sitecheckerService: A11ySitecheckerDashboardService) {
         //test
@@ -64,8 +66,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroyed$))
             .subscribe((sites) => {
                 this.analyzedSites = sites;
-                this.activeLink = sites[0].url;
-                this.siteChanged(sites[0]);
+                this.siteChanged(0);
             });
     }
 
@@ -74,14 +75,26 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
         this.destroyed$.complete();
     }
 
-    siteChanged(site: AnalyzedSite): void {
-        this.sitecheckerService
-            .getSiteResults(site)
-            .pipe(takeUntil(this.destroyed$))
-            .subscribe((s) => {
-                this.results = s;
-                this.updateChart();
-            });
+    siteChanged(siteIndex: number): void {
+        if (this.analyzedSites) {
+            this.activeUrl = this.analyzedSites[siteIndex].url;
+            this.sitecheckerService
+                .getSiteResults(this.analyzedSites[siteIndex])
+                .pipe(takeUntil(this.destroyed$))
+                .subscribe(
+                    (s) => {
+                        this.results = s;
+
+                        this.updateChart();
+                        this.loaded = true;
+                    },
+                    (error) => {
+                        console.log(error);
+                        this.results = [];
+                        this.loaded = false;
+                    },
+                );
+        }
     }
 
     updateChart(): void {
@@ -176,14 +189,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
                 true,
                 true,
             );
-            this.loaded = true;
         });
-    }
-
-    sortResultByDate(results: DashboardResult[]): A11ySitecheckerResult[] {
-        return results
-            .filter((f) => f.url === this.activeLink)[0]
-            .results.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     }
 
     selectFilter(filter: { name: string; selected: boolean }): void {
@@ -221,7 +227,7 @@ export class A11ySitecheckerDashboardComponent implements OnInit, OnDestroy {
                         }),
                         mergeMap(() =>
                             this.sitecheckerService
-                                .getViolationCoutings(this.analyzedSites?.filter((f) => f.url === this.activeLink)[0])
+                                .getViolationCoutings(this.analyzedSites?.filter((f) => f.url === this.activeUrl)[0])
                                 .pipe(takeUntil(this.destroyed$))
                                 .pipe(
                                     switchMap((f) => {

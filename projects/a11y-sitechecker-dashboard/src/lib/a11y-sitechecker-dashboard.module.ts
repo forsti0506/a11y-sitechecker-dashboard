@@ -13,12 +13,17 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { SingleResultComponent } from './single-result/single-result.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatListModule } from '@angular/material/list';
-import { SortByImpactPipe } from './sortByImpact.pipe';
+import { SortByImpactPipe } from './pipes/sortByImpact.pipe';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FixedScrollingDirective } from './directives/fixed-scrolling.directive';
+import { LoadingComponent } from './loading/loading.component';
 
 @NgModule({
-    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, SortByImpactPipe],
+    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, SortByImpactPipe, FixedScrollingDirective, LoadingComponent],
     imports: [
         MatCardModule,
         MatIconModule,
@@ -33,6 +38,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         MatChipsModule,
         MatListModule,
         MatButtonToggleModule,
+        MatProgressSpinnerModule,
+        ScrollingModule,
+        MatFormFieldModule,
+        MatInputModule,
         MatProgressSpinnerModule,
     ],
     exports: [A11ySitecheckerDashboardComponent],

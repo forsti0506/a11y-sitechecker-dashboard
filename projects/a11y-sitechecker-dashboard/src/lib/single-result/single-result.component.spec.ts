@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SingleResultComponent } from './single-result.component';
-import { SortByImpactPipe } from '../sortByImpact.pipe';
+import { SortByImpactPipe } from '../pipes/sortByImpact.pipe';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('SingleResultComponent', () => {

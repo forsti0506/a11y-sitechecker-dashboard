@@ -11,8 +11,9 @@ import { entry } from 'a11y-sitechecker';
 import { setupAxeConfig, setupConfig } from 'a11y-sitechecker/lib/utils/setup-config';
 import { v4 as uuidv4 } from 'uuid';
 import { SiteResult } from '../src/lib/models/site-result';
-import { AnalyzedSite } from '../src/lib/a11y-sitechecker-dashboard.service';
+import { AnalyzedSite } from '../src/lib/services/a11y-sitechecker-dashboard.service';
 import { getEscaped } from 'a11y-sitechecker/lib/utils/helper-functions';
+import { Config } from 'a11y-sitechecker/lib/models/config';
 
 interface FileObject {
     id: string;
@@ -100,9 +101,11 @@ function defineExtraTags(sitecheckerResult: A11ySitecheckerResult): void {
 }
 
 async function setupTimeResults(): Promise<void> {
+    const a11ySitecheckerConfig: Config = setupConfig(commander.opts());
+    const axeConfig = setupAxeConfig(a11ySitecheckerConfig);
     const sitecheckerResult: A11ySitecheckerResult = await entry(
-        setupConfig(commander.opts()),
-        setupAxeConfig(config),
+        a11ySitecheckerConfig,
+        axeConfig,
         commander.args[0],
         true,
     );
@@ -278,6 +281,7 @@ async function getCountings(id: string, timestamp: string, fileEnding: string): 
 }
 
 (async (): Promise<void> => {
+    const startTime = Date.now();
     const options = commander.opts();
     if (options.config) {
         const configFile = JSON.parse(fs.readFileSync(options.config).toString('utf-8'));
@@ -294,4 +298,5 @@ async function getCountings(id: string, timestamp: string, fileEnding: string): 
 
     analyzedUrl = commander.args[0];
     await setupTimeResults();
+    console.log(chalk.green('Time needed for analysis (in s):' + (Date.now() - startTime) / 1000));
 })();

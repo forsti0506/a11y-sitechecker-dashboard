@@ -1,10 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
-import { A11ySitecheckerDashboardService } from '../a11y-sitechecker-dashboard.service';
-import { SortByImpactPipe } from '../sortByImpact.pipe';
+import { A11ySitecheckerDashboardService } from '../services/a11y-sitechecker-dashboard.service';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { SiteResult } from '../models/site-result';
 
 @Component({
     selector: 'app-single-result',

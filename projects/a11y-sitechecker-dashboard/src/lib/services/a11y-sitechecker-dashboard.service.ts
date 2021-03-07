@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, zip } from 'rxjs';
-import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
+import { Observable, of, throwError, zip } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { SiteResult } from './models/site-result';
+import { SiteResult } from '../models/site-result';
 import { map, mergeMap, publishReplay, refCount } from 'rxjs/operators';
+import { A11ySitecheckerResult, FullCheckerSingleResult } from 'a11y-sitechecker/lib/models/a11y-sitechecker-result';
 
 export interface AnalyzedSite {
     _id: string;
@@ -31,11 +31,13 @@ export class A11ySitecheckerDashboardService {
     }
 
     getSiteResults(site: AnalyzedSite): Observable<SiteResult[]> {
+        if (!site) {
+            return throwError(new Error('siteObject is undefined'));
+        }
         if (this.serverMode) {
             return this.httpClient.get<SiteResult[]>('http://localhost:4201/siteResults/' + site._id);
         } else {
             const result: Observable<SiteResult>[] = [];
-            const i = 0;
             for (const f of site.files) {
                 result.push(this.httpClient.get<SiteResult>(f.replace('src/', '')));
             }
