@@ -1,3 +1,16 @@
+# [1.10.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.9.0...v1.10.0) (2021-03-07)
+
+
+### Bug Fixes
+
+* angular localize test ([323c120](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/323c120732dab450d8cb176251c5ee82a7c2dd2a))
+* missing files ([84bef43](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/84bef43be9878fc822bb11f7b6cbe924b19bd7be))
+
+
+### Features
+
+* scrolling and performance ([9452e6b](https://github.com/forsti0506/a11y-sitechecker-dashboard/commit/9452e6b4fbb10f21adc00b072fe1c6c523d3c43b))
+
 # [1.9.0](https://github.com/forsti0506/a11y-sitechecker-dashboard/compare/v1.8.1...v1.9.0) (2021-03-04)
 
 
