@@ -25,6 +25,9 @@
   "dependencies": {
     "tslib": "^2.1.0"
   },
+  "devDependencies": {
+    "@angular/localize": "^11.2.4"
+  },
   "bin": {
     "a11y-sitechecker-dashboard": "./bin/a11y-sitechecker.js"
   },

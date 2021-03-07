@@ -1,31 +1,13 @@
-<mat-toolbar color="primary" role="banner" *ngIf="showToolbar">
-  <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <h1>A11y-Sitechecker Dashboard</h1>
-  <mat-form-field appearance="outline" class="pt-3">
-    <mat-label>Sites</mat-label>
-    <select matNativeControl required (change)="siteChanged($event.target?.value)">
-      <option *ngFor="let site of analyzedSites; trackBy: trackBySiteId; let i = index" [value]="i" class="sitechooser-panel">{{site.url}}</option>
-    </select>
-  </mat-form-field>
-  <span class="example-spacer"></span>
-  <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
-    <mat-icon>favorite</mat-icon>
-  </button>
-  <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
-    <mat-icon>share</mat-icon>
-  </button>
-</mat-toolbar>
+<app-header [showToolbar]="showToolbar" [analyzedSites]="analyzedSites" (siteChanged)="siteChanged($event)"></app-header>
 <app-loading [loaded]="this.loaded"></app-loading>
 <mat-card class="m-5" *ngIf="loaded">
   <mat-card-content>
     <mat-button-toggle-group (change)="loadViolationDevelopment($event)" value="{{showChart}}">
       <mat-button-toggle value="general">
-        Show general overview
+        General overview
       </mat-button-toggle>
       <mat-button-toggle value="violations">
-        Show Violations by url
+        Violations by url
       </mat-button-toggle>
     </mat-button-toggle-group>
     <div [chart]="chart"></div>
@@ -103,8 +85,4 @@
 
   </mat-card-content>
 </mat-card>
-<mat-toolbar color="primary" role="contentinfo" *ngIf="showFooter && loaded">
-  <div style="margin: auto;">The A11y-sitechecker-dashboard is programmed by Martin Forstner. Details can be found on: <a href="https://github.com/forsti0506/a11y-sitechecker-dashboard">Github</a>
-  </div>
-
-</mat-toolbar>
+<app-footer [showFooter]="showFooter" [loaded]="loaded"></app-footer>

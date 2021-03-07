@@ -21,9 +21,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FixedScrollingDirective } from './directives/fixed-scrolling.directive';
 import { LoadingComponent } from './loading/loading.component';
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
-    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, SortByImpactPipe, FixedScrollingDirective, LoadingComponent],
+    declarations: [A11ySitecheckerDashboardComponent, SingleResultComponent, SortByImpactPipe, FixedScrollingDirective, LoadingComponent, HeaderComponent, FooterComponent],
     imports: [
         MatCardModule,
         MatIconModule,
